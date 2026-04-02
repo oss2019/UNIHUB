@@ -1,7 +1,7 @@
-const express = require("express");
-const passport = require("passport");
-const jwt = require("jsonwebtoken");
-const { protect } = require("../middlewares/authMiddleware");
+import express from "express";
+import passport from "passport";
+import jwt from "jsonwebtoken";
+import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -123,4 +123,4 @@ router.get("/me", protect, (req, res) => {
     res.json({ status: "ok", user: req.user });
 });
 
-module.exports = router;
+export default router;

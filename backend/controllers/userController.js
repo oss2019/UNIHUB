@@ -1,7 +1,7 @@
-const User = require("../models/userModel");
+import User from "../models/userModel.js";
 
 // GET /api/users/:id — public profile
-const getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select(
             "-googleId -__v"
@@ -20,7 +20,7 @@ const getUserProfile = async (req, res) => {
 };
 
 // PATCH /api/users/:id — edit own profile (auth required)
-const updateUserProfile = async (req, res) => {
+export const updateUserProfile = async (req, res) => {
     try {
         // Only allow users to edit their own profile
         if (req.user._id.toString() !== req.params.id) {
@@ -67,5 +67,3 @@ const updateUserProfile = async (req, res) => {
         res.status(500).json({ status: "error", message: error.message });
     }
 };
-
-module.exports = { getUserProfile, updateUserProfile };

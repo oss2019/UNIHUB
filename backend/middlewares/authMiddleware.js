@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
+import jwt from "jsonwebtoken";
+import User from "../models/userModel.js";
 
-const protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
     try {
         // Get token from httpOnly cookie
         const token = req.cookies?.accessToken;
@@ -34,5 +34,3 @@ const protect = async (req, res, next) => {
         });
     }
 };
-
-module.exports = { protect };

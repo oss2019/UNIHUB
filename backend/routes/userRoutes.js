@@ -1,9 +1,9 @@
-const express = require("express");
-const { protect } = require("../middlewares/authMiddleware");
-const {
+import express from "express";
+import { protect } from "../middlewares/authMiddleware.js";
+import {
     getUserProfile,
     updateUserProfile,
-} = require("../controllers/userController");
+} from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -13,4 +13,4 @@ router.get("/:id", getUserProfile);
 // PATCH /api/users/:id — edit own profile (auth required)
 router.patch("/:id", protect, updateUserProfile);
 
-module.exports = router;
+export default router;
