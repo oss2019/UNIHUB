@@ -5,6 +5,8 @@ import session from 'express-session';
 import passport from './config/passport.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import globalErrorHandler from './controllers/errorController.js';
+import { AppError } from './utils/appError.js';
 
 const app = express();
 
@@ -26,5 +28,13 @@ app.use(passport.session());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api/users', userRoutes);
+
+//* Middleware which send error if none of the Routes mentioned are req and something else is req
+app.use((req, res, next) => {
+  next(new AppError(404, `Could not find ${req.originalUrl} on the server`));
+});
+
+// Global error handler — must be the LAST middleware
+app.use(globalErrorHandler);
 
 export default app;
