@@ -1,18 +1,26 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../models/userModel.js";
+import { AppError } from "../utils/appError.js";
+
+const getAllowedDomain = () =>
+    (process.env.COLLEGE_EMAIL_DOMAIN || "iitdh.ac.in").replace(/^@/, "").toLowerCase();
+
+const isAllowedCollegeEmail = (email) => {
+    if (!email || typeof email !== "string") return false;
+    const normalizedEmail = email.trim().toLowerCase();
+    const allowedDomain = getAllowedDomain();
+    return normalizedEmail.endsWith(`@${allowedDomain}`);
+};
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 
-passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await User.findById(id);
-        done(null, user);
-    } catch (err) {
-        done(err, null);
-    }
+passport.deserializeUser((id, done) => {
+    User.findById(id)
+        .then((user) => done(null, user))
+        .catch((err) => done(new AppError(500, err.message), null));
 });
 
 passport.use(
@@ -21,41 +29,42 @@ passport.use(
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             callbackURL: process.env.GOOGLE_CALLBACK_URL,
+            passReqToCallback: false,
         },
-        async (accessToken, refreshToken, profile, done) => {
-            try {
-                const email = profile.emails[0].value;
+        (accessToken, refreshToken, profile, done) => {
+            const email = profile?.emails?.[0]?.value;
 
-                // Validate email domain
-                if (!email.endsWith(`@${process.env.COLLEGE_EMAIL_DOMAIN}`)) {
-                    return done(null, false, {
-                        message: `Only @${process.env.COLLEGE_EMAIL_DOMAIN} emails are allowed`,
-                    });
-                }
-
-                // Upsert user by email
-                let user = await User.findOneAndUpdate(
-                    { email },
-                    {
-                        $set: {
-                            googleId: profile.id,
-                            name: profile.displayName,
-                            avatar: profile.photos[0]?.value || "",
-                            isVerified: true,
-                            lastActive: new Date(),
-                        },
-                        $setOnInsert: {
-                            email,
-                            role: "student",
-                        },
-                    },
-                    { upsert: true, new: true, runValidators: true }
-                );
-
-                return done(null, user);
-            } catch (err) {
-                return done(err, null);
+            if (!email) {
+                return done(new AppError(400, "Google account email is not available"), null);
             }
+
+            // Validate email domain
+            if (!isAllowedCollegeEmail(email)) {
+                return done(null, false, {
+                    message: `Only @${getAllowedDomain()} emails are allowed`,
+                });
+            }
+
+            // Upsert user by email
+            return User.findOneAndUpdate(
+                { email },
+                {
+                    $set: {
+                        googleId: profile.id,
+                        name: profile.displayName,
+                        avatar: profile.photos[0]?.value || "",
+                        isVerified: true,
+                        lastActive: new Date(),
+                    },
+                    $setOnInsert: {
+                        email,
+                        role: "student",
+                    },
+                },
+                { upsert: true, new: true, runValidators: true }
+            )
+                .then((user) => done(null, user))
+                .catch((err) => done(new AppError(500, err.message), null));
         }
     )
 );
