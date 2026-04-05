@@ -1,5 +1,6 @@
 /* eslint-disable arrow-body-style */
 import { AppError } from "../utils/appError.js";
+import { sendResponse } from "../utils/appResponse.js";
 
 const handleCastErrorDB = (err) => {
   return new AppError(400, `Invalid ${err.path} ${err.value}`);
@@ -37,7 +38,7 @@ const handleInternalOAuthError = (err) => {
 };
 
 const sendErrorDev = (res, err) => {
-  res.status(err.statusCode).json({
+  return res.status(err.statusCode).json({
     status: err.status,
     error: err,
     message: err.message,
@@ -47,19 +48,29 @@ const sendErrorDev = (res, err) => {
 
 const sendErrorProd = (res, err) => {
   if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
+    return sendResponse(
+      res,
+      err.statusCode,
+      err.status,
+      null,
+      null,
+      undefined,
+      err.message
+    );
   } else {
     // Log error for yourself since it is an unexpected error
     console.error("Error 🔴", err);
 
     //send generic response
-    res.status(500).json({
-      status: "error",
-      message: "OOPs! Something Went Wrong!!!",
-    });
+    return sendResponse(
+      res,
+      500,
+      "error",
+      null,
+      null,
+      undefined,
+      "OOPs! Something Went Wrong!!!"
+    );
   }
 };
 
