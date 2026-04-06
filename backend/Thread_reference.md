@@ -1,5 +1,6 @@
 # REFERENCE — Threads Module (Person C)
 
+📖 **API Documentation:** See [`backend/docs/THREADS_API_GUIDE.md`](./docs/THREADS_API_GUIDE.md) for the complete route-level API reference (endpoints, request/response formats, query params).
 ## New Dependency
 
 **`express-validator`** has been added to the project.  
@@ -33,7 +34,7 @@ Tags on threads are automatically sanitized on creation and update:
 ### 4. Role-Based Access Control
 A strict permission matrix governs who can do what, based on Forum state and user role. 
 
-👉 **See the exhaustive [PERMISSIONS.md](./PERMISSIONS.md) matrix for the complete operational breakdown.**
+👉 **See the exhaustive [Thread_permissions.md](./Thread_permissions.md) matrix for the complete operational breakdown.**
 
 ### 5. Input Validation & Ghost Attack Prevention
 All incoming requests pass through `express-validator` middleware before reaching any controller logic:
