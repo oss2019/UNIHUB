@@ -1,33 +1,40 @@
-import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import passport from './config/passport.js';
-import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import globalErrorHandler from './controllers/errorController.js';
-import { AppError } from './utils/appError.js';
-
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import passport from "./config/passport.js";
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import globalErrorHandler from "./controllers/errorController.js";
+import { AppError } from "./utils/appError.js";
+import forumRoutes from "./forum-module-v2/routes/forumRoutes.js";
+import subForumRoutes from "./forum-module-v2/routes/subForumRoutes.js";
+app.use("/api", forumRoutes);
+app.use("/api", subForumRoutes);
 const app = express();
 
 // Middleware
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
-}));
+  }),
+);
 app.use(express.json());
 app.use(cookieParser());
-app.use(session({
+app.use(
+  session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-}));
+  }),
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/api/users', userRoutes);
+app.use("/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 //* Middleware which send error if none of the Routes mentioned are req and something else is req
 app.use((req, res, next) => {
