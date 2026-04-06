@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { Forum } from "../models/forumModel.js";
 import { SubForum } from "../models/subforumModel.js";
-import { catchAsync } from "../../../utils/catchAsync.js";
-import { AppError } from "../../../utils/appError.js";
-import { cleanTags } from "../utils/tagUtils.js";
-import { sendResponse } from "../../../utils/sendResponse.js";
+import { catchAsync } from "../utils/catchAsync.js";
+import { AppError } from "../utils/appError.js";
+import { cleanTags, escapeRegex } from "../utils/tagUtils.js";
+import { sendResponse } from "../utils/appResponse.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/forums/:forumId/subforums  (public)
@@ -70,7 +70,7 @@ export const updateSubForum = catchAsync(async (req, res, next) => {
   if (name && name.trim() !== subForum.name) {
     const duplicate = await SubForum.findOne({
       forum: subForum.forum,
-      name: { $regex: `^${name.trim()}$`, $options: "i" },
+      name: { $regex: `^${escapeRegex(name.trim())}$`, $options: "i" },
       _id: { $ne: subForum._id },
     });
     if (duplicate) {

@@ -1,9 +1,9 @@
 import { Forum } from "../models/forumModel.js";
 import { SubForum, SubForumRequest } from "../models/subforumModel.js";
-import { catchAsync } from "../../../utils/catchAsync.js";
-import { AppError } from "../../../utils/appError.js";
-import { cleanTags } from "../utils/tagUtils.js";
-import { sendResponse } from "../../../utils/sendResponse.js";
+import { catchAsync } from "../utils/catchAsync.js";
+import { AppError } from "../utils/appError.js";
+import { cleanTags, escapeRegex } from "../utils/tagUtils.js";
+import { sendResponse } from "../utils/appResponse.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/forums/:forumId/subforum-requests
@@ -23,7 +23,7 @@ export const submitSubForumRequest = catchAsync(async (req, res, next) => {
   // No existing sub-forum with this name in this forum
   const existingSub = await SubForum.findOne({
     forum: forumId,
-    name: { $regex: `^${name.trim()}$`, $options: "i" },
+    name: { $regex: `^${escapeRegex(name.trim())}$`, $options: "i" },
   });
   if (existingSub) {
     return next(
@@ -38,7 +38,7 @@ export const submitSubForumRequest = catchAsync(async (req, res, next) => {
   const duplicateRequest = await SubForumRequest.findOne({
     requestedBy: req.user._id,
     forum: forumId,
-    name: { $regex: `^${name.trim()}$`, $options: "i" },
+    name: { $regex: `^${escapeRegex(name.trim())}$`, $options: "i" },
     status: "pending",
   });
   if (duplicateRequest) {
@@ -128,7 +128,7 @@ export const reviewSubForumRequest = catchAsync(async (req, res, next) => {
   if (status === "approved") {
     const duplicate = await SubForum.findOne({
       forum: request.forum._id,
-      name: { $regex: `^${request.name}$`, $options: "i" },
+      name: { $regex: `^${escapeRegex(request.name)}$`, $options: "i" },
     });
     if (duplicate) {
       return next(
@@ -144,7 +144,7 @@ export const reviewSubForumRequest = catchAsync(async (req, res, next) => {
       description: request.description,
       forum: request.forum._id,
       tags: request.tags,
-      createdBy: req.user._id,
+      createdBy: request.requestedBy,
     });
 
     request.subForumCreated = subForum._id;

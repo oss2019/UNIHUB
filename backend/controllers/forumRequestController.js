@@ -1,7 +1,8 @@
 import { Forum, ForumRequest } from "../models/forumModel.js";
-import { catchAsync } from "../../../utils/catchAsync.js";
-import { AppError } from "../../../utils/appError.js";
-import { sendResponse } from "../../../utils/sendResponse.js";
+import { catchAsync } from "../utils/catchAsync.js";
+import { AppError } from "../utils/appError.js";
+import { sendResponse } from "../utils/appResponse.js";
+import { escapeRegex } from "../utils/tagUtils.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/forum-requests
@@ -14,7 +15,7 @@ export const submitForumRequest = catchAsync(async (req, res, next) => {
 
   // Reject if a forum with this name already exists
   const existingForum = await Forum.findOne({
-    name: { $regex: `^${name.trim()}$`, $options: "i" },
+    name: { $regex: `^${escapeRegex(name.trim())}$`, $options: "i" },
   });
   if (existingForum) {
     return next(
@@ -25,7 +26,7 @@ export const submitForumRequest = catchAsync(async (req, res, next) => {
   // Reject if this user already has a pending request with the same name
   const duplicateRequest = await ForumRequest.findOne({
     requestedBy: req.user._id,
-    name: { $regex: `^${name.trim()}$`, $options: "i" },
+    name: { $regex: `^${escapeRegex(name.trim())}$`, $options: "i" },
     status: "pending",
   });
   if (duplicateRequest) {
@@ -105,7 +106,7 @@ export const reviewForumRequest = catchAsync(async (req, res, next) => {
   if (status === "approved") {
     // Guard against a race condition where two admins act at the same time
     const duplicate = await Forum.findOne({
-      name: { $regex: `^${request.name}$`, $options: "i" },
+      name: { $regex: `^${escapeRegex(request.name)}$`, $options: "i" },
     });
     if (duplicate) {
       return next(
@@ -116,7 +117,7 @@ export const reviewForumRequest = catchAsync(async (req, res, next) => {
     const forum = await Forum.create({
       name: request.name,
       description: request.description,
-      createdBy: req.user._id,
+      createdBy: request.requestedBy,
     });
 
     request.forumCreated = forum._id;

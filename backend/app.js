@@ -7,10 +7,8 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
 import { AppError } from "./utils/appError.js";
-import forumRoutes from "./forum-module-v2/routes/forumRoutes.js";
-import subForumRoutes from "./forum-module-v2/routes/subForumRoutes.js";
-app.use("/api", forumRoutes);
-app.use("/api", subForumRoutes);
+import forumRoutes from "./routes/forumRoutes.js";
+import subForumRoutes from "./routes/subForumRoutes.js";
 const app = express();
 
 // Middleware
@@ -35,6 +33,8 @@ app.use(passport.session());
 // Routes
 app.use("/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api", forumRoutes);
+app.use("/api", subForumRoutes);
 
 //* Middleware which send error if none of the Routes mentioned are req and something else is req
 app.use((req, res, next) => {

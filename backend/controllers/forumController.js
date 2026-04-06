@@ -1,8 +1,9 @@
 import { Forum } from "../models/forumModel.js";
 import { SubForum } from "../models/subforumModel.js";
-import { catchAsync } from "../../../utils/catchAsync.js";
-import { AppError } from "../../../utils/appError.js";
-import { sendResponse } from "../../../utils/sendResponse.js";
+import { catchAsync } from "../utils/catchAsync.js";
+import { AppError } from "../utils/appError.js";
+import { sendResponse } from "../utils/appResponse.js";
+import { escapeRegex } from "../utils/tagUtils.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/forums  (public)
@@ -58,7 +59,7 @@ export const updateForum = catchAsync(async (req, res, next) => {
 
   if (name && name.trim() !== forum.name) {
     const duplicate = await Forum.findOne({
-      name: { $regex: `^${name.trim()}$`, $options: "i" },
+      name: { $regex: `^${escapeRegex(name.trim())}$`, $options: "i" },
       _id: { $ne: forum._id },
     });
     if (duplicate)

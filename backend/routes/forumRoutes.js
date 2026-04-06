@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../../../middlewares/authMiddleware.js";
+import { protect } from "../middlewares/authMiddleware.js";
 import { requireAdmin } from "../middlewares/forumMiddleware.js";
 import {
   submitForumRequest,

@@ -10,3 +10,7 @@ export const cleanTags = (tags) => [
       .filter(Boolean),
   ),
 ];
+
+// Escape special regex characters so user input is treated as a literal string
+export const escapeRegex = (str) =>
+  str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

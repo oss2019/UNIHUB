@@ -12,7 +12,7 @@
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { AppError } from "../../../utils/appError.js";
+import { AppError } from "../utils/appError.js";
 
 // Must be used AFTER protect.
 // Blocks any role that is not 'admin'.
