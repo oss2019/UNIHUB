@@ -5,6 +5,8 @@ import session from 'express-session';
 import passport from './config/passport.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import threadRoutes from './routes/threadRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
 import globalErrorHandler from './controllers/errorController.js';
 import { AppError } from './utils/appError.js';
 
@@ -15,7 +17,8 @@ app.use(cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -28,6 +31,8 @@ app.use(passport.session());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/threads', threadRoutes);
+app.use('/api/messages', messageRoutes);
 
 //* Middleware which send error if none of the Routes mentioned are req and something else is req
 app.use((req, res, next) => {

@@ -104,3 +104,12 @@ dist
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# ── Local Test Environments & Automated Reports ──
+Photos/
+Photos_links/
+*_result.md
+*_audit.md
+*_report.md
+*_empty.md
+*_sanitization.md
