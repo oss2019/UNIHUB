@@ -82,7 +82,7 @@ import passport from "./config/passport.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import threadRoutes from "./routes/threadRoutes.js";
-import messageRoutes from "./routes/messageRoutes.js";
+//import messageRoutes from "./routes/messageRoutes.js";
 import forumRoutes from "./routes/forumRoutes.js";
 import subForumRoutes from "./routes/subForumRoutes.js";
 
@@ -120,7 +120,7 @@ app.use(passport.session());
 app.use("/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/threads", threadRoutes);
-app.use("/api/messages", messageRoutes);
+//app.use("/api/messages", messageRoutes);
 app.use("/api", forumRoutes);
 app.use("/api", subForumRoutes);
 
