@@ -1,5 +1,5 @@
-import { Forum } from "../models/forumModel.js";
-import { SubForum, SubForumRequest } from "../models/subforumModel.js";
+import  Forum from "../models/forumModel.js";
+import  SubForum, {SubForumRequest } from "../models/subforumModel.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { AppError } from "../utils/appError.js";
 import { cleanTags, escapeRegex } from "../utils/tagUtils.js";

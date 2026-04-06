@@ -1,4 +1,5 @@
-import cloudinary from '../utils/cloudinary.js';
+//import {cloudinary }from '../utils/cloudinary.js';
+import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 
 export const uploadBase64Attachments = async (attachments) => {
     if (!attachments || !Array.isArray(attachments) || attachments.length === 0) return [];

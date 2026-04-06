@@ -1,5 +1,5 @@
-import { Forum } from "../models/forumModel.js";
-import { SubForum } from "../models/subforumModel.js";
+import  Forum from "../models/forumModel.js";
+import  SubForum  from "../models/subforumModel.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { AppError } from "../utils/appError.js";
 import { sendResponse } from "../utils/appResponse.js";
@@ -9,12 +9,13 @@ import { escapeRegex } from "../utils/tagUtils.js";
 // GET /api/forums  (public)
 // All active forums with a live sub-forum count attached to each.
 // ─────────────────────────────────────────────────────────────────────────────
+console.log("HIT getAllForums");
 export const getAllForums = catchAsync(async (req, res, next) => {
   const forums = await Forum.find({ isActive: true })
     .populate("createdBy", "name")
     .sort({ createdAt: -1 });
 
-  // Attach live sub-forum count without an extra aggregation pipeline
+  //Attach live sub-forum count without an extra aggregation pipeline
   const data = await Promise.all(
     forums.map(async (f) => {
       const subForumCount = await SubForum.countDocuments({
@@ -24,10 +25,15 @@ export const getAllForums = catchAsync(async (req, res, next) => {
       return { ...f.toObject(), subForumCount };
     }),
   );
+  //const data = forums;
 
   sendResponse(res, 200, "ok", "forums", data, data.length);
 });
-
+// export const getAllForums = (req, res) => {
+//   res.status(200).json({
+//     message: "WORKING ",
+//   });
+// };
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/forums/:id  (public)
 // Single forum with all its active sub-forums.
@@ -98,3 +104,14 @@ export const deleteForum = catchAsync(async (req, res, next) => {
     `Forum "${forum.name}" has been deactivated.`,
   );
 });
+
+//testing forum
+export const createForum = async (req, res) => {
+  const forum = await Forum.create({
+    name: req.body.name,
+    description: req.body.description,
+    createdBy: null,
+  });
+
+  sendResponse(res, 201, "ok", "forum", forum);
+};

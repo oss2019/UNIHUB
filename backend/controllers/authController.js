@@ -48,23 +48,68 @@ const clearTokenCookies = (res) => {
 	res.clearCookie("refreshToken", getCookieOptions());
 };
 
+// export const googleCallback = catchAsync(async (req, res, next) => {
+// 	passport.authenticate("google", { session: false }, (err, user) => {
+// 		if (err || !user) {
+// 			clearTokenCookies(res);
+// 			return res.redirect(`${process.env.CLIENT_URL}/login?error=invalid_domain`);
+// 		}
+// 		console.log("User email:", user?.email);
+// 		if (!isAllowedCollegeEmail(user.email)) {
+// 			clearTokenCookies(res);
+// 			return res.redirect(`${process.env.CLIENT_URL}/login?error=invalid_domain`);
+// 		}
+
+// 		const { accessToken, refreshToken } = generateTokens(user);
+// 		setTokenCookies(res, accessToken, refreshToken);
+
+// 		return res.redirect(process.env.CLIENT_URL);
+// 	})(req, res, next);
+// });
 export const googleCallback = catchAsync(async (req, res, next) => {
-	passport.authenticate("google", { session: false }, (err, user) => {
-		if (err || !user) {
-			clearTokenCookies(res);
-			return res.redirect(`${process.env.CLIENT_URL}/login?error=invalid_domain`);
-		}
+    passport.authenticate("google", { session: false }, (err, user, info) => {
+        
+        // Log everything so you can debug
+        console.log("=== Google Callback Debug ===");
+        console.log("err:", err);
+        console.log("user:", user);
+        console.log("info:", info);
+        console.log("=============================");
 
-		if (!isAllowedCollegeEmail(user.email)) {
-			clearTokenCookies(res);
-			return res.redirect(`${process.env.CLIENT_URL}/login?error=invalid_domain`);
-		}
+        if (err) {
+            return next(new AppError(500, err.message || "OAuth error"));
+        }
 
-		const { accessToken, refreshToken } = generateTokens(user);
-		setTokenCookies(res, accessToken, refreshToken);
+        if (!user) {
+            // info.message will tell you WHY it failed
+            const reason = info?.message || "Authentication failed";
+            console.log("Auth failed reason:", reason);
+            
+            
+            return res.redirect(
+                `${process.env.CLIENT_URL}/login?error=${encodeURIComponent(reason)}`
+            );
+        }
 
-		return res.redirect(process.env.CLIENT_URL);
-	})(req, res, next);
+        const { accessToken, refreshToken } = generateTokens(user);
+        setTokenCookies(res, accessToken, refreshToken);
+
+        console.log("Login successful for:", user.email);
+return res.status(200).json({
+    status: "success",
+    message: "Login successful",
+    data: {
+        user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+        },
+        accessToken,  // ← copy this value for all Postman requests
+    },
+});
+
+    })(req, res, next);
 });
 
 export const refreshAccessToken = catchAsync(async (req, res, next) => {
