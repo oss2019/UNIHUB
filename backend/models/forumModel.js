@@ -76,5 +76,13 @@ const forumSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export const Forum = mongoose.model("Forum", forumSchema);
-export const ForumRequest = mongoose.model("ForumRequest", forumRequestSchema);
+// export const Forum = mongoose.model("Forum", forumSchema);
+// export const ForumRequest = mongoose.model("ForumRequest", forumRequestSchema);
+const Forum =
+  mongoose.models.Forum || mongoose.model("Forum", forumSchema);
+const ForumRequest =
+  mongoose.models.ForumRequest ||
+  mongoose.model("ForumRequest", forumRequestSchema);
+
+export { ForumRequest };
+export default Forum;

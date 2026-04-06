@@ -85,19 +85,27 @@ import threadRoutes from "./routes/threadRoutes.js";
 //import messageRoutes from "./routes/messageRoutes.js";
 import forumRoutes from "./routes/forumRoutes.js";
 import subForumRoutes from "./routes/subForumRoutes.js";
+import commentRouter from "./routes/commentRoutes.js";
 
 import globalErrorHandler from "./controllers/errorController.js";
 import { AppError } from "./utils/appError.js";
 
 const app = express();
 
+app.get("/test", (req, res) => {
+  res.status(200).json({ message: "TEST WORKING " });
+});
+
 // Middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: "*",
     credentials: true,
   })
 );
+app.get("/", (req, res) => {
+  res.send("Login successful 🎉");
+});
 
 // Body parsers (keeping your extended version for flexibility)
 app.use(express.json({ limit: "50mb" }));
@@ -123,11 +131,15 @@ app.use("/api/threads", threadRoutes);
 //app.use("/api/messages", messageRoutes);
 app.use("/api", forumRoutes);
 app.use("/api", subForumRoutes);
+app.use("/api/comments", commentRouter);
+
 
 // 404 handler
 app.use((req, res, next) => {
   next(new AppError(404, `Could not find ${req.originalUrl} on the server`));
 });
+//test
+
 
 // Global error handler
 app.use(globalErrorHandler);

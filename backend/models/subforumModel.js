@@ -98,8 +98,12 @@ const subForumSchema = new mongoose.Schema(
 subForumSchema.index({ forum: 1 });
 subForumSchema.index({ tags: 1 });
 
-export const SubForum = mongoose.model("SubForum", subForumSchema);
-export const SubForumRequest = mongoose.model(
-  "SubForumRequest",
-  subForumRequestSchema,
-);
+const SubForum =
+  mongoose.models.SubForum || mongoose.model("SubForum", subForumSchema);
+
+const SubForumRequest =
+  mongoose.models.SubForumRequest ||
+  mongoose.model("SubForumRequest", subForumRequestSchema);
+
+export { SubForumRequest };
+export default SubForum;

@@ -1,4 +1,4 @@
-import { Forum, ForumRequest } from "../models/forumModel.js";
+import Forum,{ ForumRequest } from "../models/forumModel.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { AppError } from "../utils/appError.js";
 import { sendResponse } from "../utils/appResponse.js";
