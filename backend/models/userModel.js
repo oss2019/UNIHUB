@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      match: [/.*@.*iitdh\.ac\.in$/, 'Only iitdh.ac.in emails are allowed'],
+      match: [/^[A-Z0-9._%+-]+@iitdh\.ac\.in$/i, 'Only iitdh.ac.in emails are allowed'],
     },
     name: { type: String, required: true },
     avatar: { type: String },
