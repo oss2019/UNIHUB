@@ -72,7 +72,7 @@ const forumSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    // For Threads module — Required for thread visibility checks
+    // For Threads module — Required for permissions checks
     isApproved: {
       type: Boolean,
       default: false,
