@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════════
-// UNIHUB — INTEGRATION TEST SUITE V3 (test_bulk_threads.js)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// UNIHUB â€” INTEGRATION TEST SUITE V3 (test_bulk_threads.js)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -13,18 +13,18 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 import Thread from '../../models/threadModel.js';
-import SubForum from '../../models/dummySubForumModel.js';
+import { SubForum } from '../../models/subforumModel.js';
 import User from '../../models/userModel.js';
-import Forum from '../../models/dummyForumModel.js';
+import { Forum } from '../../models/forumModel.js';
 import {
     createThread, updateThread, deleteThread,
     getSubForumThreads, getForumThreads, getThread, searchThreads
 } from '../../controllers/threadController.js';
 import { validateThreadParamId, validateThreadCreation } from '../../validators/threadValidator.js';
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  MOCK UTILITIES
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const mockRes = () => {
     const res = {};
     res.status = (code) => { res.statusCode = code; return res; };
@@ -66,9 +66,9 @@ const runCreationValidation = async (req) => {
     return null;
 };
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  TEST REPORT ENGINE
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let reportLog = [];
 let passedCount = 0;
 let failedCount = 0;
@@ -76,29 +76,29 @@ let failedCount = 0;
 const logResult = (name, desc, expected, got, condition) => {
     if (condition) {
         passedCount++;
-        console.log(`✅ ${name}: ${desc}`);
-        reportLog.push(`| ✅ ${name} | ${desc} | ${expected} | ${got} |`);
+        console.log(`âœ… ${name}: ${desc}`);
+        reportLog.push(`| âœ… ${name} | ${desc} | ${expected} | ${got} |`);
     } else {
         failedCount++;
-        console.error(`❌ ${name}: ${desc}\n   Expected: ${expected}\n   Got: ${got}`);
-        reportLog.push(`| ❌ **FAILED: ${name}** | ${desc} | ${expected} | ${got} |`);
+        console.error(`âŒ ${name}: ${desc}\n   Expected: ${expected}\n   Got: ${got}`);
+        reportLog.push(`| âŒ **FAILED: ${name}** | ${desc} | ${expected} | ${got} |`);
     }
 };
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  MAIN
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function runBulkTests() {
     try {
         await mongoose.connect(process.env.MONGO_URI);
-        console.log("🚀 Wiping Database & Seeding Complex Env...");
+        console.log("ðŸš€ Wiping Database & Seeding Complex Env...");
 
         await Thread.deleteMany({});
         await SubForum.deleteMany({});
         await Forum.deleteMany({});
         await User.deleteMany({});
 
-        // ── 1. USERS (1 Admin, 4 Alumni, 5 Students = 10 total) ──
+        // â”€â”€ 1. USERS (1 Admin, 4 Alumni, 5 Students = 10 total) â”€â”€
         const admin = await User.create({ googleId: 'a1', email: 'admin@iitdh.ac.in', name: 'Admin One', role: 'admin' });
         
         const alumniList = [];
@@ -121,25 +121,25 @@ async function runBulkTests() {
         const stud4 = studentList[3];
         const stud5 = studentList[4];
 
-        // ── 2. FORUMS (5 Total — covering all 4 modes + a second Live) ──
+        // â”€â”€ 2. FORUMS (5 Total â€” covering all 4 modes + a second Live) â”€â”€
         const csForum      = await Forum.create({ name: 'Computer Science', isApproved: true,  isActive: true });
         const generalForum = await Forum.create({ name: 'General',          isApproved: true,  isActive: true });
         const eeForum      = await Forum.create({ name: 'Electrical',       isApproved: false, isActive: true });
         const meForum      = await Forum.create({ name: 'Mechanical',       isApproved: true,  isActive: false });
         const mathForum    = await Forum.create({ name: 'Mathematics',      isApproved: false, isActive: false });
 
-        // ── 3. SUBFORUMS (Tags designed with INTRA + INTER overlap) ──
+        // â”€â”€ 3. SUBFORUMS (Tags designed with INTRA + INTER overlap) â”€â”€
         // CS Forum
         const webDevSF = await SubForum.create({ name: 'Web Dev',    tags: ['react', 'node', 'python', 'nextjs'], forum: csForum._id });
         const aiSF     = await SubForum.create({ name: 'AI & ML',    tags: ['python', 'pytorch', 'data'],         forum: csForum._id });
         const cyberSF  = await SubForum.create({ name: 'Cyber Sec',  tags: ['security', 'networking', 'linux'],   forum: csForum._id });
-        // ↑ 'python' overlaps INTRA (Web Dev ↔ AI)
+        // â†‘ 'python' overlaps INTRA (Web Dev â†” AI)
 
         // General Forum
         const eventSF  = await SubForum.create({ name: 'Events',     tags: ['fest', 'hackathon', 'networking'],   forum: generalForum._id });
         const careerSF = await SubForum.create({ name: 'Careers',    tags: ['placement', 'resume', 'python'],     forum: generalForum._id });
         const hobSF    = await SubForum.create({ name: 'Hobbies',    tags: ['gaming', 'music', 'photography'],    forum: generalForum._id });
-        // ↑ 'networking' overlaps INTER (CyberSec ↔ Events), 'python' overlaps INTER (CS ↔ Careers)
+        // â†‘ 'networking' overlaps INTER (CyberSec â†” Events), 'python' overlaps INTER (CS â†” Careers)
 
         // EE Forum (Pending)
         const vlsiSF   = await SubForum.create({ name: 'VLSI',       tags: ['vlsi', 'verilog', 'fpga'],           forum: eeForum._id });
@@ -148,12 +148,12 @@ async function runBulkTests() {
         // ME Forum (Archived)
         const autoSF   = await SubForum.create({ name: 'Automobile', tags: ['ev', 'engines', 'design'],           forum: meForum._id });
         const thermoSF = await SubForum.create({ name: 'Thermo',     tags: ['heat', 'fluid', 'design'],           forum: meForum._id });
-        // ↑ 'design' overlaps INTRA (Automobile ↔ Thermo)
+        // â†‘ 'design' overlaps INTRA (Automobile â†” Thermo)
 
         // Math Forum (Dead)
         const calcSF   = await SubForum.create({ name: 'Calculus',   tags: ['calc', 'integration', 'data'],       forum: mathForum._id });
         const algSF    = await SubForum.create({ name: 'Algebra',    tags: ['linear', 'matrices', 'data'],        forum: mathForum._id });
-        // ↑ 'data' overlaps INTRA (Calc ↔ Algebra) AND INTER (AI & ML)
+        // â†‘ 'data' overlaps INTRA (Calc â†” Algebra) AND INTER (AI & ML)
 
         // Build Report Header
         let reportText = `# UNIHUB Integration Test Results (V3)
@@ -161,33 +161,33 @@ async function runBulkTests() {
 ## 1. Environment State
 ### Users Inserted (10 Total)
 - Admins: 1 (admin@iitdh.ac.in)
-- Alumni: 4 (alumni1–4@iitdh.ac.in)
-- Students: 5 (student1–5@iitdh.ac.in)
+- Alumni: 4 (alumni1â€“4@iitdh.ac.in)
+- Students: 5 (student1â€“5@iitdh.ac.in)
 
 ### Forums & Permissions Map
 | Forum | isApproved | isActive | Mode | SubForums | Visibility (Non-Admin) | Post Access |
 | :--- | :---: | :---: | :--- | :--- | :--- | :--- |
-| **Computer Science** | ✅ | ✅ | Live | Web Dev, AI & ML, Cyber Sec | Visible (All Levels) | All Users |
-| **General** | ✅ | ✅ | Live | Events, Careers, Hobbies | Visible (All Levels) | All Users |
-| **Electrical** | ❌ | ✅ | Pending | VLSI, Power Sys | Hidden at List, Visible Individual | Admins Only |
-| **Mechanical** | ✅ | ❌ | Archived | Automobile, Thermo | Visible (All Levels) | Blocked |
-| **Mathematics** | ❌ | ❌ | Dead | Calculus, Algebra | Hidden (Admin Only) | Blocked |
+| **Computer Science** | âœ… | âœ… | Live | Web Dev, AI & ML, Cyber Sec | Visible (All Levels) | All Users |
+| **General** | âœ… | âœ… | Live | Events, Careers, Hobbies | Visible (All Levels) | All Users |
+| **Electrical** | âŒ | âœ… | Pending | VLSI, Power Sys | Hidden at List, Visible Individual | Admins Only |
+| **Mechanical** | âœ… | âŒ | Archived | Automobile, Thermo | Visible (All Levels) | Blocked |
+| **Mathematics** | âŒ | âŒ | Dead | Calculus, Algebra | Hidden (Admin Only) | Blocked |
 
 ### Tag Map (with Overlaps)
 | SubForum | Tags | Intra-Overlap | Inter-Overlap |
 | :--- | :--- | :--- | :--- |
-| Web Dev (CS) | react, node, python, nextjs | python → AI & ML | python → Careers |
-| AI & ML (CS) | python, pytorch, data | python → Web Dev | data → Calculus, Algebra |
-| Cyber Sec (CS) | security, networking, linux | — | networking → Events |
-| Events (General) | fest, hackathon, networking | — | networking → Cyber Sec |
-| Careers (General) | placement, resume, python | — | python → Web Dev, AI & ML |
-| Hobbies (General) | gaming, music, photography | — | — |
-| VLSI (EE) | vlsi, verilog, fpga | — | — |
-| Power Sys (EE) | power, grid, renewable | — | — |
-| Automobile (ME) | ev, engines, design | design → Thermo | — |
-| Thermo (ME) | heat, fluid, design | design → Automobile | — |
-| Calculus (Math) | calc, integration, data | data → Algebra | data → AI & ML |
-| Algebra (Math) | linear, matrices, data | data → Calculus | data → AI & ML |
+| Web Dev (CS) | react, node, python, nextjs | python â†’ AI & ML | python â†’ Careers |
+| AI & ML (CS) | python, pytorch, data | python â†’ Web Dev | data â†’ Calculus, Algebra |
+| Cyber Sec (CS) | security, networking, linux | â€” | networking â†’ Events |
+| Events (General) | fest, hackathon, networking | â€” | networking â†’ Cyber Sec |
+| Careers (General) | placement, resume, python | â€” | python â†’ Web Dev, AI & ML |
+| Hobbies (General) | gaming, music, photography | â€” | â€” |
+| VLSI (EE) | vlsi, verilog, fpga | â€” | â€” |
+| Power Sys (EE) | power, grid, renewable | â€” | â€” |
+| Automobile (ME) | ev, engines, design | design â†’ Thermo | â€” |
+| Thermo (ME) | heat, fluid, design | design â†’ Automobile | â€” |
+| Calculus (Math) | calc, integration, data | data â†’ Algebra | data â†’ AI & ML |
+| Algebra (Math) | linear, matrices, data | data â†’ Calculus | data â†’ AI & ML |
 
 ---
 
@@ -230,9 +230,32 @@ async function runBulkTests() {
         await run(createThread, { user: stud4, body: { title: "Empty Arr", content: "Body", subForumId: webDevSF._id, tags: [] }}, resA6);
         logResult("A6 Empty Array", "Empty tags array rejected.", "400", resA6.error?.statusCode, resA6.error?.statusCode === 400);
 
+        const resA7 = mockRes();
+        await run(createThread, { user: stud1, body: { title: "Hyphen Check", content: "Body", subForumId: webDevSF._id, tags: ["Web Dev", "Artificial Intelligence"] }}, resA7);
+        const a7Tags = resA7.data?.data?.thread?.tags || [];
+        logResult("A7 Hyphenation (Pass)", "Spaces are safely converted to hyphens.", "['web-dev', 'artificial-intelligence']", `[${a7Tags}]`, a7Tags.includes('web-dev') && a7Tags.includes('artificial-intelligence'));
+
+        const resA10 = mockRes();
+        await run(createThread, { user: stud1, body: { title: "Hyphen Multiple Spaces", content: "Body", subForumId: webDevSF._id, tags: ["Machine     Learning", " deep  learning "] }}, resA10);
+        const a10Tags = resA10.data?.data?.thread?.tags || [];
+        logResult("A10 Hyphen Collapse (Edge)", "Multiple consecutive spaces collapse into a single hyphen without duplication.", "['machine-learning', 'deep-learning']", `[${a10Tags}]`, a10Tags.includes('machine-learning') && a10Tags.length === 2);
+
+        const resA11 = mockRes();
+        await run(createThread, { user: stud1, body: { title: "Already Hyphenated", content: "Body", subForumId: webDevSF._id, tags: ["react-native", "  vue-js  "] }}, resA11);
+        const a11Tags = resA11.data?.data?.thread?.tags || [];
+        logResult("A11 Pre-Hyphenated (Pass)", "Tags that already contain hyphens are kept intact without adding extra formatting.", "['react-native', 'vue-js']", `[${a11Tags}]`, a11Tags.includes('react-native'));
+
+        const resA8 = mockRes();
+        await run(createThread, { user: stud1, body: { title: "Type Coercion", content: "Body", subForumId: webDevSF._id, tags: [2024, true] }}, resA8);
+        const a8Tags = resA8.data?.data?.thread?.tags || [];
+        logResult("A8 Type Safety (Pass)", "Non-string primitive tags are safely converted to strings.", "['2024', 'true']", `[${a8Tags}]`, a8Tags.includes('2024') && a8Tags.includes('true'));
+
+        const resA9 = mockRes();
+        await run(createThread, { user: stud4, body: { title: "Null Filtering", content: "Body", subForumId: webDevSF._id, tags: [null, undefined] }}, resA9);
+        logResult("A9 Null Safety (Fail)", "Threads with only null/undefined tags are filtered out and rejected.", "400", resA9.error?.statusCode, resA9.error?.statusCode === 400);
 
         // =====================================================================
-        // SECTION B: Forum Gates — Creation (10 tests)
+        // SECTION B: Forum Gates â€” Creation (10 tests)
         // =====================================================================
         console.log("\n--- SECTION B: Forum Gates ---");
         
@@ -283,11 +306,11 @@ async function runBulkTests() {
 
 
         // =====================================================================
-        // SECTION C: Visibility & Audit Mode — 3-Level GET (14 tests)
+        // SECTION C: Visibility & Audit Mode â€” 3-Level GET (14 tests)
         // =====================================================================
         console.log("\n--- SECTION C: Visibility Gates (3-Level) ---");
         
-        // ── C: PENDING (Electrical) ──
+        // â”€â”€ C: PENDING (Electrical) â”€â”€
         const auditThread = await Thread.create({ title: "Audit Target", content: "Hidden", author: admin._id, subForum: vlsiSF._id, forum: eeForum._id, tags: ['vlsi'] });
 
         const resC1 = mockRes();
@@ -310,7 +333,7 @@ async function runBulkTests() {
         await run(getThread, { user: alum4, params: { id: auditThread._id } }, resC5);
         logResult("C5 Pending Individual Alumni", "Alumni views pending thread via direct ID.", "success", resC5.data?.status, resC5.data?.status === 'success');
 
-        // ── C: ARCHIVED (Mechanical) ──
+        // â”€â”€ C: ARCHIVED (Mechanical) â”€â”€
         const archThread = await Thread.create({ title: "Archived Content", content: "Old", author: alum1._id, subForum: autoSF._id, forum: meForum._id, tags: ['ev'] });
 
         const resC6 = mockRes();
@@ -325,7 +348,7 @@ async function runBulkTests() {
         await run(getThread, { user: stud3, params: { id: archThread._id } }, resC8);
         logResult("C8 Archived Individual Student", "Student views archived thread.", "success", resC8.data?.status, resC8.data?.status === 'success');
 
-        // ── C: DEAD (Mathematics) ──
+        // â”€â”€ C: DEAD (Mathematics) â”€â”€
         const deadThread = await Thread.create({ title: "Dead Content", content: "Gone", author: admin._id, subForum: calcSF._id, forum: mathForum._id, tags: ['calc'] });
 
         const resC9 = mockRes();
@@ -348,7 +371,7 @@ async function runBulkTests() {
         await run(getThread, { user: alum3, params: { id: deadThread._id } }, resC13);
         logResult("C13 Dead Individual Alumni", "Alumni blocked from dead thread.", "403", resC13.error?.statusCode, resC13.error?.statusCode === 403);
 
-        // ── C: LIVE cross-check (General) ──
+        // â”€â”€ C: LIVE cross-check (General) â”€â”€
         const resC14 = mockRes();
         await run(getForumThreads, { user: stud5, params: { id: generalForum._id }, query: {} }, resC14);
         logResult("C14 Live General Student", "Student sees General forum feed.", "> 0", resC14.data?.results, resC14.data?.results > 0);
@@ -541,11 +564,11 @@ async function runBulkTests() {
         reportText += `\n\n### Summary\n- **Total:** ${passedCount + failedCount}\n- **Passed:** ${passedCount}\n- **Failed:** ${failedCount}`;
 
         fs.writeFileSync(path.join(__dirname, 'result.md'), reportText);
-        console.log(`\n🎉 Report generated successfully at tests/integration/result.md`);
+        console.log(`\nðŸŽ‰ Report generated successfully at tests/integration/result.md`);
         process.exit(0);
 
     } catch (err) {
-        console.error("💥 SYSTEM ERROR:", err);
+        console.error("ðŸ’¥ SYSTEM ERROR:", err);
         process.exit(1);
     }
 }

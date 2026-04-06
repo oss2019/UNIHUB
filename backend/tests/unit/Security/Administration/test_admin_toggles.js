@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
@@ -9,9 +9,9 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../../../../.env') });
 
 import Thread from '../../../../models/threadModel.js';
-import SubForum from '../../../../models/dummySubForumModel.js';
+import { SubForum } from '../../../../models/subforumModel.js';
 import User from '../../../../models/userModel.js';
-import Forum from '../../../../models/dummyForumModel.js';
+import { Forum } from '../../../../models/forumModel.js';
 import { updateThread } from '../../../../controllers/threadController.js';
 
 const mockRes = () => {
@@ -21,7 +21,7 @@ const mockRes = () => {
     return res;
 };
 
-// ────────── TEST RUNNER ──────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ TEST RUNNER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function runAdminTogglesMatrix() {
     try {
         await mongoose.connect(process.env.MONGO_URI);
@@ -56,9 +56,9 @@ Verifies the explicit lockout mechanisms for the Thread-level Pin/Unpin toggle, 
 
 ## Thread Pin State Matrix
 **Expectation:** Thread pinning is purely an administrative privilege. Even the original Author of a thread cannot pin/unpin it unless they also hold an Admin token.
-- **Self-Author (Admin) / Foreign Admin**: Allowed (200 OK) — Admin token grants pin rights.
-- **Self-Author (Alumni) / Self-Author (Student)**: Blocked (403 Forbidden) — Authorship alone does NOT grant pin rights.
-- **Foreign Alumni / Foreign Student**: Blocked (403 Forbidden) — No authority whatsoever.
+- **Self-Author (Admin) / Foreign Admin**: Allowed (200 OK) â€” Admin token grants pin rights.
+- **Self-Author (Alumni) / Self-Author (Student)**: Blocked (403 Forbidden) â€” Authorship alone does NOT grant pin rights.
+- **Foreign Alumni / Foreign Student**: Blocked (403 Forbidden) â€” No authority whatsoever.
 
 `;
 
@@ -91,7 +91,7 @@ Verifies the explicit lockout mechanisms for the Thread-level Pin/Unpin toggle, 
                 const gotCode = errCaught ? errCaught.statusCode || errCaught.status || 403 : res.data?.statusCode || 200;
                 const passed = (gotCode === expectedCode);
                 if(passed) P++; else F++;
-                const icon = passed ? '✅ PASS' : '❌ FAIL';
+                const icon = passed ? 'âœ… PASS' : 'âŒ FAIL';
                 reportText += `| **${rConfig.desc}** | ${expectedCode} | ${gotCode} | ${icon} |\n`;
             }
             reportText += `\n---\n\n`;
@@ -100,7 +100,7 @@ Verifies the explicit lockout mechanisms for the Thread-level Pin/Unpin toggle, 
         reportText += `### Execution Summary\n- Total Checks: ${P+F}\n- Passed Matrix Boundaries: ${P}\n- Failed Matrix Boundaries: ${F}`;
         
         fs.writeFileSync(path.join(__dirname, 'administration_matrix_report.md'), reportText);
-        console.log(`🎉 Matrix complete! Check administration_matrix_report.md`);
+        console.log(`ðŸŽ‰ Matrix complete! Check administration_matrix_report.md`);
         process.exit(0);
 
     } catch (err) {

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -7,14 +7,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
-import Forum from '../../models/dummyForumModel.js';
-import SubForum from '../../models/dummySubForumModel.js';
+import { Forum } from '../../models/forumModel.js';
+import { SubForum } from '../../models/subforumModel.js';
 import Thread from '../../models/threadModel.js';
 import User from '../../models/userModel.js';
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  DUMMY USERS (10 users to simulate real traffic)
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const usersData = Array.from({ length: 10 }).map((_, i) => ({
     googleId: `seed_g${i}`,
     email: `user${i}@iitdh.ac.in`,
@@ -22,7 +22,7 @@ const usersData = Array.from({ length: 10 }).map((_, i) => ({
     role: i === 0 ? 'admin' : (i < 5 ? 'alumni' : 'student')
 }));
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  7 FORUMS with requested states
 //  1. General (Active, Approved)
 //  2. Computer Science (Active, Approved)
@@ -31,7 +31,7 @@ const usersData = Array.from({ length: 10 }).map((_, i) => ({
 //  5. Electronics (Active, Not Approved)
 //  6. Sciences (Inactive, Approved)
 //  7. Mathematics (Inactive, Not Approved)
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const forumsData = [
     { name: 'General',          description: 'Open discussions', isActive: true, isApproved: true },
     { name: 'Computer Science', description: 'CS-specific threads', isActive: true, isApproved: true },
@@ -49,27 +49,27 @@ const generateThreads = (count, topic) => Array.from({ length: count }).map((_, 
     tags: [topic.toLowerCase().replace(/\s+/g, ''), 'general', 'test']
 }));
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  MAIN SEED FUNCTION
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function seedBulk() {
     try {
         await mongoose.connect(process.env.MONGO_URI);
-        console.log('✅ Connected to MongoDB.\n');
+        console.log('âœ… Connected to MongoDB.\n');
 
         await Thread.deleteMany({});
         await SubForum.deleteMany({});
         await Forum.deleteMany({});
         await User.deleteMany({});
-        console.log('🧹 Cleaned all existing data.\n');
+        console.log('ðŸ§¹ Cleaned all existing data.\n');
 
         // USERS
         const users = await User.insertMany(usersData);
-        console.log(`👥 Created ${users.length} users.`);
+        console.log(`ðŸ‘¥ Created ${users.length} users.`);
 
         // FORUMS
         const forums = await Forum.insertMany(forumsData);
-        console.log(`📁 Created ${forums.length} forums.`);
+        console.log(`ðŸ“ Created ${forums.length} forums.`);
 
         // SUBFORUMS AND THREADS
         const allSubForums = [];
@@ -108,22 +108,22 @@ async function seedBulk() {
             }
         }
 
-        console.log(`📂 Created ${allSubForums.length} subforums.`);
-        console.log(`📝 Created ${threadCount} threads.\n`);
+        console.log(`ðŸ“‚ Created ${allSubForums.length} subforums.`);
+        console.log(`ðŸ“ Created ${threadCount} threads.\n`);
 
-        console.log('════════════════════════════════════════');
+        console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
         console.log('  SEED SUMMARY');
-        console.log('════════════════════════════════════════');
+        console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
         console.log(`  Users:     ${users.length}`);
         console.log(`  Forums:    ${forums.length}`);
         console.log(`  SubForums: ${allSubForums.length}`);
         console.log(`  Threads:   ${threadCount}`);
-        console.log('════════════════════════════════════════');
-        console.log('\n🎉 Bulk seed completed successfully!');
+        console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+        console.log('\nðŸŽ‰ Bulk seed completed successfully!');
 
         process.exit(0);
     } catch (error) {
-        console.error('❌ Seed failed:', error);
+        console.error('âŒ Seed failed:', error);
         process.exit(1);
     }
 }

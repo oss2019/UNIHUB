@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
@@ -9,9 +9,9 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../../../../.env') });
 
 import Thread from '../../../../models/threadModel.js';
-import SubForum from '../../../../models/dummySubForumModel.js';
+import { SubForum } from '../../../../models/subforumModel.js';
 import User from '../../../../models/userModel.js';
-import Forum from '../../../../models/dummyForumModel.js';
+import { Forum } from '../../../../models/forumModel.js';
 import { updateThread } from '../../../../controllers/threadController.js';
 
 const mockRes = () => {
@@ -93,7 +93,7 @@ Testing textual editing modification vectors partitioned independently mapping a
                 const passed = (gotCode === expectedCode);
 
                 if(passed) P++; else F++;
-                const icon = passed ? '✅ PASS' : '❌ FAIL';
+                const icon = passed ? 'âœ… PASS' : 'âŒ FAIL';
                 reportText += `| **${rConfig.desc}** | ${action} | ${expectedCode} | ${gotCode} | ${icon} |\n`;
             }
             reportText += `\n---\n\n`;
@@ -101,7 +101,7 @@ Testing textual editing modification vectors partitioned independently mapping a
 
         reportText += `### Execution Summary\n- Total Checks: ${P+F}\n- Passed Matrix Boundaries: ${P}\n- Failed Matrix Boundaries: ${F}`;
         fs.writeFileSync(path.join(__dirname, 'modification_matrix_report.md'), reportText);
-        console.log(`🎉 Matrix complete! Check modification_matrix_report.md`);
+        console.log(`ðŸŽ‰ Matrix complete! Check modification_matrix_report.md`);
         process.exit(0);
 
     } catch (err) {

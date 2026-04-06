@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
@@ -9,9 +9,9 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
 import Thread from '../../../models/threadModel.js';
-import SubForum from '../../../models/dummySubForumModel.js';
+import { SubForum } from '../../../models/subforumModel.js';
 import User from '../../../models/userModel.js';
-import Forum from '../../../models/dummyForumModel.js';
+import { Forum } from '../../../models/forumModel.js';
 import { createThread, updateThread } from '../../../controllers/threadController.js';
 
 const mockRes = () => {
@@ -29,12 +29,12 @@ const logResult = (name, inputStr, desc, expected, got, condition) => {
     const formatGot = typeof got === 'object' ? JSON.stringify(got) : String(got);
     if (condition) {
         passedCount++;
-        console.log(`✅ ${name}: ${desc}`);
-        reportLog.push(`| ✅ ${name} | \`${inputStr}\` | ${desc} | ${expected} | ${formatGot} |`);
+        console.log(`âœ… ${name}: ${desc}`);
+        reportLog.push(`| âœ… ${name} | \`${inputStr}\` | ${desc} | ${expected} | ${formatGot} |`);
     } else {
         failedCount++;
-        console.error(`❌ ${name}: ${desc}\n   Expected: ${expected}\n   Got: ${formatGot}`);
-        reportLog.push(`| ❌ **FAILED: ${name}** | \`${inputStr}\` | ${desc} | ${expected} | ${formatGot} |`);
+        console.error(`âŒ ${name}: ${desc}\n   Expected: ${expected}\n   Got: ${formatGot}`);
+        reportLog.push(`| âŒ **FAILED: ${name}** | \`${inputStr}\` | ${desc} | ${expected} | ${formatGot} |`);
     }
 };
 
@@ -69,9 +69,9 @@ This suite explicitly pairs complementary scenarios (e.g., passing a valid array
 | :--- | :--- | :--- | :--- | :--- |
 `;
 
-        // ──────────────────────────────────────────
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // COMPLEMENTARY PAIR 1: POST CREATE THREAD
-        // ──────────────────────────────────────────
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // EXPECTED SUCCESS: Valid tags provided
         const reqCreateValid = {
             user: { _id: dummyUser._id, role: 'student' },
@@ -112,9 +112,9 @@ This suite explicitly pairs complementary scenarios (e.g., passing a valid array
             errCreateInvalid && errCreateInvalid.statusCode === 400
         );
 
-        // ──────────────────────────────────────────
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // COMPLEMENTARY PAIR 2: PATCH UPDATE THREAD
-        // ──────────────────────────────────────────
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const validThread = await Thread.create({
             title: "Valid Thread", content: "Content", author: dummyUser._id,
             subForum: dummySubForum._id, forum: dummyForum._id, tags: ["initial"]
@@ -170,7 +170,7 @@ This suite explicitly pairs complementary scenarios (e.g., passing a valid array
         reportText += `\n\n### Summary\n- **Passed:** ${passedCount}\n- **Failed:** ${failedCount}`;
 
         fs.writeFileSync(path.join(__dirname, 'test_tags_empty.md'), reportText);
-        console.log(`\n🎉 Report generated successfully at tests/unit/Tags/test_tags_empty.md`);
+        console.log(`\nðŸŽ‰ Report generated successfully at tests/unit/Tags/test_tags_empty.md`);
         process.exit(0);
 
     } catch (error) {

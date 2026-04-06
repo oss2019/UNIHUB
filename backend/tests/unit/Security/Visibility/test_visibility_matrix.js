@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
@@ -9,9 +9,9 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../../../../.env') });
 
 import Thread from '../../../../models/threadModel.js';
-import SubForum from '../../../../models/dummySubForumModel.js';
+import { SubForum } from '../../../../models/subforumModel.js';
 import User from '../../../../models/userModel.js';
-import Forum from '../../../../models/dummyForumModel.js';
+import { Forum } from '../../../../models/forumModel.js';
 import { getForumThreads, getSubForumThreads, getThread } from '../../../../controllers/threadController.js';
 
 const mockRes = () => {
@@ -76,7 +76,7 @@ Testing GET thread discovery partitioned into 3 distinct request levels across a
 
             reportText += `## Scenario: ${forum.name} Forum\n${desc}\n\n`;
 
-            // ────────── FORUM LEVEL ──────────
+            // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ FORUM LEVEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             reportText += `### Forum-Level Feed (getForumThreads)\n| Actor Entity | Expected | Actual | Status |\n| :--- | :--- | :--- | :--- |\n`;
 
             for (let rConfig of roles) {
@@ -102,11 +102,11 @@ Testing GET thread discovery partitioned into 3 distinct request levels across a
                 const gotSize = res.data?.data?.pagination?.threads?.length || 0;
                 const passed = (gotSize === expectedSize);
                 if(passed) P++; else F++;
-                const icon = passed ? '✅ PASS' : '❌ FAIL';
+                const icon = passed ? 'âœ… PASS' : 'âŒ FAIL';
                 reportText += `| **${rConfig.desc}** | ${expectedSize} items | ${gotSize} items | ${icon} |\n`;
             }
 
-            // ────────── SUBFORUM LEVEL ──────────
+            // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ SUBFORUM LEVEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             reportText += `\n### SubForum-Level Feed (getSubForumThreads)\n| Actor Entity | Expected | Actual | Status |\n| :--- | :--- | :--- | :--- |\n`;
 
             for (let rConfig of roles) {
@@ -132,11 +132,11 @@ Testing GET thread discovery partitioned into 3 distinct request levels across a
                 const gotSize = res.data?.data?.pagination?.threads?.length || 0;
                 const passed = (gotSize === expectedSize);
                 if(passed) P++; else F++;
-                const icon = passed ? '✅ PASS' : '❌ FAIL';
+                const icon = passed ? 'âœ… PASS' : 'âŒ FAIL';
                 reportText += `| **${rConfig.desc}** | ${expectedSize} items | ${gotSize} items | ${icon} |\n`;
             }
 
-            // ────────── INDIVIDUAL LEVEL ──────────
+            // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ INDIVIDUAL LEVEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             reportText += `\n### Individual-Level View (getThread)\n| Actor Entity | Expected | Actual | Status |\n| :--- | :--- | :--- | :--- |\n`;
 
             for (let rConfig of roles) {
@@ -161,7 +161,7 @@ Testing GET thread discovery partitioned into 3 distinct request levels across a
                 const gotCode = errCaught ? errCaught.statusCode || errCaught.status || 403 : 200;
                 const passed = (gotCode === expectedCode);
                 if(passed) P++; else F++;
-                const icon = passed ? '✅ PASS' : '❌ FAIL';
+                const icon = passed ? 'âœ… PASS' : 'âŒ FAIL';
                 reportText += `| **${rConfig.desc}** | ${expectedCode} | ${gotCode} | ${icon} |\n`;
             }
 
@@ -170,7 +170,7 @@ Testing GET thread discovery partitioned into 3 distinct request levels across a
 
         reportText += `### Execution Summary\n- Total Checks: ${P+F}\n- Passed Matrix Boundaries: ${P}\n- Failed Matrix Boundaries: ${F}`;
         fs.writeFileSync(path.join(__dirname, 'visibility_matrix_report.md'), reportText);
-        console.log(`🎉 Matrix complete! Check visibility_matrix_report.md`);
+        console.log(`ðŸŽ‰ Matrix complete! Check visibility_matrix_report.md`);
         process.exit(0);
 
     } catch (err) {

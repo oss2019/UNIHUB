@@ -3,14 +3,9 @@ import * as cloudinaryService from '../services/cloudinaryService.js';
 import { AppError } from '../utils/appError.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { sendResponse } from '../utils/appResponse.js';
+import { cleanTags } from '../utils/tagUtils.js';
 
-const sanitizeTags = (tags) => {
-    if (!Array.isArray(tags)) return [];
-    const cleanTags = tags
-        .map(tag => tag.toLowerCase().trim().replace(/\s+/g, ''))
-        .filter(tag => tag.length > 0);
-    return [...new Set(cleanTags)]; // Ensures all tags are unique
-};
+
 
 export const createThread = catchAsync(async (req, res, next) => {
     const { title, content, subForumId, tags, attachments } = req.body;
@@ -20,7 +15,7 @@ export const createThread = catchAsync(async (req, res, next) => {
     }
 
     // Task from Sprint Plan: Validate tags are present so thread isn't "lost"
-    const finalTags = sanitizeTags(tags);
+    const finalTags = cleanTags(tags);
     if (finalTags.length === 0) {
         return next(new AppError(400, "At least one valid tag is required for discoverability"));
     }
@@ -213,7 +208,7 @@ export const updateThread = catchAsync(async (req, res, next) => {
     if (req.body.title) thread.title = req.body.title;
     if (req.body.content) thread.content = req.body.content;
     if (req.body.tags) {
-        const updatedTags = sanitizeTags(req.body.tags);
+        const updatedTags = cleanTags(req.body.tags);
         if (updatedTags.length === 0) {
             return next(new AppError(400, "At least one valid tag is required for discoverability"));
         }
