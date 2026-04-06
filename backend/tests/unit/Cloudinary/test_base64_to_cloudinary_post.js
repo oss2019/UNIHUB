@@ -22,13 +22,13 @@ app.listen(PORT, async () => {
     // Grabbing your exact literal text file chunk!
     const base64ImagePath = path.join(__dirname, '../../image_links/base64.txt');
     let base64Image = fs.readFileSync(base64ImagePath, 'utf8').trim();
-    
+
     // Auto-fix if it has newlines or spaces copied randomly
     base64Image = base64Image.replace(/\s+/g, '');
 
     try {
         console.log("--- 1. Firing POST /api/threads with your custom Base64 String ---");
-        
+
         const postRes = await fetch(`${API_URL}`, {
             method: 'POST',
             headers: {
@@ -43,14 +43,14 @@ app.listen(PORT, async () => {
                 attachments: [base64Image] // Your exact code running natively!
             })
         });
-        
+
         const postData = await postRes.json();
         console.log("\n✅ Response from POST /threads -> It should convert the ugly base64 string to a secure URL automatically:\n");
         console.log(JSON.stringify(postData, null, 2));
 
         console.log("\n--- TEST COMPLETED ---");
         process.exit(0);
-    } catch(err) {
+    } catch (err) {
         console.error("\n❌ Error Encountered:");
         console.error(err.message || err);
         process.exit(1);
