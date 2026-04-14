@@ -4,7 +4,13 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node tests/run_all.js",
+    "test:thread_tests": "node tests/thread_tests/run_all.js",
+    "test:thread_tests:integration": "node tests/thread_tests/integration/run_all.js",
+    "test:thread_tests:unit:cloudinary": "node tests/thread_tests/unit/Cloudinary/run_all.js",
+    "test:thread_tests:unit:security": "node tests/thread_tests/unit/Security/run_all.js",
+    "test:thread_tests:unit:tags": "node tests/thread_tests/unit/Tags/run_all.js",
+    "test:thread_tests:unit": "node tests/thread_tests/unit/run_all.js",
     "dev": "node server.js",
     "start": "nodemon server.js"
   },
