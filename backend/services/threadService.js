@@ -51,6 +51,17 @@ export const getThreadsByForumId = async (forumId, skip, limit) => {
     return { threads, totalCount };
 };
 
+export const getThreadsByAuthor = async (authorId, skip, limit) => {
+    const filter = { author: authorId };
+    const threads = await Thread.find(filter)
+        .sort({ isPinned: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('author', 'name avatar role');
+    const totalCount = await Thread.countDocuments(filter);
+    return { threads, totalCount };
+};
+
 export const findThreadById = async (id) => {
     return await Thread.findById(id).populate('author', 'name avatar role');
 };

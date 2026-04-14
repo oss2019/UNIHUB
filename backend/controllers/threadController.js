@@ -246,3 +246,24 @@ export const deleteThread = catchAsync(async (req, res, next) => {
 
     return sendResponse(res, 200, "success", "thread", null, undefined, "Thread deleted successfully");
 });
+
+// ─────────────────────────────────────────────────────────
+// Person A Integration: GET /api/users/:id/threads
+// Returns all threads authored by a specific user.
+// Person A should import this into userRoutes.js
+// ─────────────────────────────────────────────────────────
+export const getUserThreads = catchAsync(async (req, res, next) => {
+    const limit = parseInt(req.query.limit) || 20;
+    const page = parseInt(req.query.page) || 1;
+    const skip = (page - 1) * limit;
+
+    const { threads, totalCount } = await threadService.getThreadsByAuthor(req.params.id, skip, limit);
+
+    const payload = {
+        threads,
+        totalCount,
+        hasMore: skip + threads.length < totalCount
+    };
+
+    return sendResponse(res, 200, "success", "pagination", payload, threads.length);
+});
