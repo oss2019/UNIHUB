@@ -23,6 +23,13 @@ router.get(
     "/google/callback",
     googleCallback
 );
+// router.get(
+//   "/google/callback",
+//   passport.authenticate("google", {
+//     failureRedirect: "/login",
+//   }),
+//   googleCallback
+// );
 
 router.post("/refresh", refreshAccessToken);
 

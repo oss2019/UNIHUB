@@ -1,6 +1,6 @@
 import Thread from '../models/threadModel.js';
-import { SubForum } from '../models/subforumModel.js';
-import { Forum } from '../models/forumModel.js';
+import SubForum from '../models/subforumModel.js';
+import Forum from '../models/forumModel.js';
 import { deleteAttachedAssets } from './cloudinaryService.js';
 
 export const findSubForumById = async (id) => {

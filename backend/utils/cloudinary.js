@@ -1,27 +1,41 @@
-import 'dotenv/config';
-import path from 'path';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from "cloudinary";
+import { AppError } from "./appError.js";
 
-// 1. Get the current directory of this file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-// 2. Explicitly point to the .env file (one level up from this file)
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
-
-// 3. Use native SDK detection - it's much more robust than a manual regex!
-if (process.env.CLOUDINARY_URL) {
-    cloudinary.config(true); // Automatically detects process.env.CLOUDINARY_URL
-} else {
-    // Fallback for separate keys
-    cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET,
-        secure: true
+export const uploadToCloudinary = (fileBuffer, folder = "comments", resourceType = "auto") => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder,
+                resource_type: resourceType,
+            },
+            (error, result) => {
+                if (error) {
+                    return reject(new AppError(500, `Cloudinary upload failed: ${error.message}`));
+                }
+                resolve({
+                    url: result.secure_url,
+                    publicId: result.public_id,
+                });
+            }
+        );
+        uploadStream.end(fileBuffer);
     });
-}
+};
 
-export default cloudinary;
+export const deleteFromCloudinary = async (publicId, resourceType = "auto") => {
+    if (!publicId) return;
+
+    try {
+        await cloudinary.uploader.destroy(publicId, {
+            resource_type: resourceType,
+        });
+    } catch (error) {
+        console.error("Cloudinary delete failed:", error.message);
+    }
+};
