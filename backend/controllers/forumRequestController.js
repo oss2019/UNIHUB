@@ -9,7 +9,7 @@ import { escapeRegex } from "../utils/tagUtils.js";
 // Any verified (college email) user can submit a request to create a forum.
 // ─────────────────────────────────────────────────────────────────────────────
 export const submitForumRequest = catchAsync(async (req, res, next) => {
-  const { name, description } = req.body;
+  const { name, description, type } = req.body;
 
   if (!name?.trim()) return next(new AppError(400, "Forum name is required."));
 
@@ -42,6 +42,7 @@ export const submitForumRequest = catchAsync(async (req, res, next) => {
     requestedBy: req.user._id,
     name: name.trim(),
     description: description?.trim() || null,
+    type: type || 'normal',
   });
 
   sendResponse(res, 201, "ok", "request", request);
@@ -118,6 +119,7 @@ export const reviewForumRequest = catchAsync(async (req, res, next) => {
       name: request.name,
       description: request.description,
       createdBy: request.requestedBy,
+      type: request.type,
     });
 
     request.forumCreated = forum._id;

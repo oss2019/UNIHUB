@@ -1,5 +1,6 @@
 import  Forum from "../models/forumModel.js";
 import  SubForum, {SubForumRequest } from "../models/subforumModel.js";
+import  User  from "../models/userModel.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { AppError } from "../utils/appError.js";
 import { cleanTags, escapeRegex } from "../utils/tagUtils.js";
@@ -149,6 +150,11 @@ export const reviewSubForumRequest = catchAsync(async (req, res, next) => {
 
     request.subForumCreated = subForum._id;
     await request.save();
+
+    // Auto-enroll the owner in their own sub-forum
+    await User.findByIdAndUpdate(request.requestedBy, {
+      $addToSet: { joinedSubForums: subForum._id },
+    });
 
     return sendResponse(res, 200, "ok", "reviewResult", { request, subForum });
   }

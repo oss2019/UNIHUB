@@ -35,6 +35,12 @@ const forumRequestSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    // What kind of forum is being requested
+    type: {
+      type: String,
+      enum: ['normal', 'collab'],
+      default: 'normal',
+    },
     // Populated once admin approves — points to the created Forum
     forumCreated: {
       type: mongoose.Schema.Types.ObjectId,
@@ -76,6 +82,13 @@ const forumSchema = new mongoose.Schema(
     isApproved: {
       type: Boolean,
       default: false,
+    },
+    // 'normal' = standard discussion forum
+    // 'collab' = project-based; sub-forums are projects, threads are project discussions
+    type: {
+      type: String,
+      enum: ['normal', 'collab'],
+      default: 'normal',
     },
   },
   { timestamps: true },

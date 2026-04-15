@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import  Forum  from "../models/forumModel.js";
 import  SubForum  from "../models/subforumModel.js";
+import  User  from "../models/userModel.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { AppError } from "../utils/appError.js";
 import { cleanTags, escapeRegex } from "../utils/tagUtils.js";
@@ -113,4 +114,67 @@ export const deleteSubForum = catchAsync(async (req, res, next) => {
     undefined,
     `Sub-forum "${subForum.name}" has been deactivated.`,
   );
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/subforums/:id/join  (any verified user)
+// ─────────────────────────────────────────────────────────────────────────────
+export const joinSubForum = catchAsync(async (req, res, next) => {
+  const subForum = await SubForum.findOne({ _id: req.params.id, isActive: true });
+  if (!subForum) return next(new AppError(404, "SubForum not found."));
+
+  const user = req.user;
+
+  // Avoid duplicates
+  if (user.joinedSubForums.map(id => id.toString()).includes(subForum._id.toString())) {
+    return next(new AppError(409, "You are already a member of this sub-forum."));
+  }
+
+  user.joinedSubForums.push(subForum._id);
+  await user.save({ validateBeforeSave: false });
+
+  sendResponse(res, 200, "ok", null, null, undefined, "Joined successfully.");
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/subforums/:id/leave  (any verified user)
+// ─────────────────────────────────────────────────────────────────────────────
+export const leaveSubForum = catchAsync(async (req, res, next) => {
+  const subForum = await SubForum.findOne({ _id: req.params.id, isActive: true });
+  if (!subForum) return next(new AppError(404, "SubForum not found."));
+
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: { joinedSubForums: subForum._id },
+  });
+
+  sendResponse(res, 200, "ok", null, null, undefined, "Left sub-forum.");
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/subforums/:id/mute  (any verified user)
+// Mutes a sub-forum — user will NOT receive any notifications from it
+// ─────────────────────────────────────────────────────────────────────────────
+export const muteSubForum = catchAsync(async (req, res, next) => {
+  const subForum = await SubForum.findOne({ _id: req.params.id, isActive: true });
+  if (!subForum) return next(new AppError(404, "SubForum not found."));
+
+  await User.findByIdAndUpdate(req.user._id, {
+    $addToSet: { mutedSubForums: subForum._id },
+  });
+
+  sendResponse(res, 200, "ok", null, null, undefined, "Sub-forum muted.");
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/subforums/:id/unmute  (any verified user)
+// ─────────────────────────────────────────────────────────────────────────────
+export const unmuteSubForum = catchAsync(async (req, res, next) => {
+  const subForum = await SubForum.findOne({ _id: req.params.id, isActive: true });
+  if (!subForum) return next(new AppError(404, "SubForum not found."));
+
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: { mutedSubForums: subForum._id },
+  });
+
+  sendResponse(res, 200, "ok", null, null, undefined, "Sub-forum unmuted.");
 });
