@@ -31,9 +31,29 @@ const userSchema = new mongoose.Schema(
         ref: 'Forum',
       },
     ],
+
+    // Sub-forums this user has explicitly joined
+    // Mirrors joinedForums pattern; stays small (~10-50 entries per user)
+    joinedSubForums: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SubForum',
+    }],
+
+    // Sub-forums this user has muted (no notifications from these)
+    mutedSubForums: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SubForum',
+    }],
+
+    // Tags the user is interested in (for collab thread notifications)
+    interests: [{ type: String, lowercase: true, trim: true }],
   },
   { timestamps: true }
 );
+
+// Index for fast "who joined sub-forum X?" queries
+userSchema.index({ joinedSubForums: 1 });
+userSchema.index({ mutedSubForums: 1 });
 
 const User = mongoose.model('User', userSchema);
 export default User;

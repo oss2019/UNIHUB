@@ -58,7 +58,13 @@ export const getForumById = catchAsync(async (req, res, next) => {
 // Update forum name, description, or toggle isActive.
 // ─────────────────────────────────────────────────────────────────────────────
 export const updateForum = catchAsync(async (req, res, next) => {
-  const { name, description, isActive } = req.body;
+  const { name, description, isActive, type } = req.body;
+
+  // Forum.type is immutable after creation — changing it would break
+  // the semantics of all sub-forums, threads, and work requests inside.
+  if (type !== undefined) {
+    return next(new AppError(400, "Forum type cannot be changed after creation."));
+  }
 
   const forum = await Forum.findById(req.params.id);
   if (!forum) return next(new AppError(404, "Forum not found."));

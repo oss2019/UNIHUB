@@ -12,6 +12,10 @@ import {
   getSubForumById,
   updateSubForum,
   deleteSubForum,
+  joinSubForum,
+  leaveSubForum,
+  muteSubForum,
+  unmuteSubForum,
 } from "../controllers/subForumController.js";
 
 const router = express.Router();
@@ -52,5 +56,19 @@ router.patch("/subforums/:id", protect, requireAdmin, updateSubForum);
 
 // DELETE /api/subforums/:id — admin only (soft delete)
 router.delete("/subforums/:id", protect, requireAdmin, deleteSubForum);
+
+// ─── SubForum Membership ─────────────────────────────────────────────────────
+
+// POST /api/subforums/:id/join — any verified user
+router.post("/subforums/:id/join", protect, joinSubForum);
+
+// POST /api/subforums/:id/leave — any verified user
+router.post("/subforums/:id/leave", protect, leaveSubForum);
+
+// POST /api/subforums/:id/mute — any verified user
+router.post("/subforums/:id/mute", protect, muteSubForum);
+
+// POST /api/subforums/:id/unmute — any verified user
+router.post("/subforums/:id/unmute", protect, unmuteSubForum);
 
 export default router;
