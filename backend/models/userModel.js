@@ -44,9 +44,6 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'SubForum',
     }],
-
-    // Tags the user is interested in (for collab thread notifications)
-    interests: [{ type: String, lowercase: true, trim: true }],
   },
   { timestamps: true }
 );
