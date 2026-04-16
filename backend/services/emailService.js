@@ -20,7 +20,7 @@ const getTransporter = () => {
   if (transporter) return transporter;
 
   if (
-    process.env.NODE_ENV === 'production' &&
+    // process.env.NODE_ENV === 'production' &&
     process.env.SMTP_HOST &&
     process.env.SMTP_USER
   ) {
@@ -33,18 +33,19 @@ const getTransporter = () => {
         pass: process.env.SMTP_PASS,
       },
     });
-  } else {
-    // Development: log emails to console
-    transporter = {
-      sendMail: async (mailOptions) => {
-        console.log('[EmailService][DEV] Would send email:');
-        console.log(`  To:      ${mailOptions.to}`);
-        console.log(`  Subject: ${mailOptions.subject}`);
-        console.log(`  Body:    ${mailOptions.text || mailOptions.html?.substring(0, 200)}`);
-        return { messageId: 'dev-mock-id' };
-      },
-    };
-  }
+  } 
+  // else {
+  //   // Development: log emails to console
+  //   transporter = {
+  //     sendMail: async (mailOptions) => {
+  //       console.log('[EmailService][DEV] Would send email:');
+  //       console.log(`  To:      ${mailOptions.to}`);
+  //       console.log(`  Subject: ${mailOptions.subject}`);
+  //       console.log(`  Body:    ${mailOptions.text || mailOptions.html?.substring(0, 200)}`);
+  //       return { messageId: 'dev-mock-id' };
+  //     },
+  //   };
+  // }
 
   return transporter;
 };

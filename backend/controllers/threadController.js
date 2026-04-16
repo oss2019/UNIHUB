@@ -4,6 +4,7 @@ import { AppError } from '../utils/appError.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { sendResponse } from '../utils/appResponse.js';
 import { cleanTags } from '../utils/tagUtils.js';
+import * as notificationService from '../services/notificationService.js';
 
 
 
@@ -42,8 +43,13 @@ export const createThread = catchAsync(async (req, res, next) => {
         subForum: subForum._id,
         forum: subForum.forum, // AUTO-SETS FORUM from subForum.forum field
         tags: finalTags, // validates tags
-        attachments: processedAttachments
+        attachments: processedAttachments,
+        notifyAlumni: forum.type === 'normal' ? (req.body.notifyAlumni || false) : false,
     });
+
+    if (forum.type === 'collab') {
+     await notificationService.notifySubForumMembers(newThread);
+    }
 
     // Requirement Page 9: Prepare hook point for @mention detection (Week 3)
     // TODO: const mentions = scanForMentions(content);
