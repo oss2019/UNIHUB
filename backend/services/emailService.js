@@ -33,19 +33,19 @@ const getTransporter = () => {
         pass: process.env.SMTP_PASS,
       },
     });
-  } 
-  // else {
-  //   // Development: log emails to console
-  //   transporter = {
-  //     sendMail: async (mailOptions) => {
-  //       console.log('[EmailService][DEV] Would send email:');
-  //       console.log(`  To:      ${mailOptions.to}`);
-  //       console.log(`  Subject: ${mailOptions.subject}`);
-  //       console.log(`  Body:    ${mailOptions.text || mailOptions.html?.substring(0, 200)}`);
-  //       return { messageId: 'dev-mock-id' };
-  //     },
-  //   };
-  // }
+  } else {
+    // Development: log emails to console
+    transporter = {
+      sendMail: async (mailOptions) => {
+        console.log('\n📧 [EmailService][DEV] WOULD SEND EMAIL:');
+        console.log(`   To:      ${mailOptions.to}`);
+        console.log(`   Subject: ${mailOptions.subject}`);
+        console.log(`   Body:    ${mailOptions.text || mailOptions.html?.substring(0, 200)}`);
+        console.log('--------------------------------------------------\n');
+        return { messageId: 'dev-mock-id' };
+      },
+    };
+  }
 
   return transporter;
 };
