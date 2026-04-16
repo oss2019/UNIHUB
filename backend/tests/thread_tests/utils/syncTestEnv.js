@@ -25,10 +25,10 @@ export async function syncTestEnv() {
             await mongoose.connect(process.env.MONGO_URI);
         }
 
-        const User = mongoose.model('User', new mongoose.Schema({}), 'users');
-        const Thread = mongoose.model('Thread', new mongoose.Schema({}), 'threads');
-        const SubForum = mongoose.model('SubForum', new mongoose.Schema({}), 'subforums');
-        const Forum = mongoose.model('Forum', new mongoose.Schema({}), 'forums');
+        const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({}), 'users');
+        const Thread = mongoose.models.Thread || mongoose.model('Thread', new mongoose.Schema({}), 'threads');
+        const SubForum = mongoose.models.SubForum || mongoose.model('SubForum', new mongoose.Schema({}), 'subforums');
+        const Forum = mongoose.models.Forum || mongoose.model('Forum', new mongoose.Schema({}), 'forums');
 
         const [user, thread, subforum, forum] = await Promise.all([
             User.findOne(),
@@ -42,12 +42,27 @@ export async function syncTestEnv() {
 
         if (user) {
             const userId = user._id.toString();
+            
+            // Update TEST_USER_ID
+            if (process.env.TEST_USER_ID !== userId) {
+                if (process.env.TEST_USER_ID) {
+                    envContent = envContent.replace(/TEST_USER_ID=.*/, `TEST_USER_ID=${userId}`);
+                } else {
+                    envContent += `\nTEST_USER_ID=${userId}`;
+                }
+                needsUpdate = true;
+            }
+
             const secret = process.env.JWT_SECRET;
             const newToken = jwt.sign({ id: userId }, secret, { expiresIn: '365d' });
             
             // Update TEST_JWT if it changed or is missing
             if (!process.env.TEST_JWT || process.env.TEST_JWT !== newToken) {
-                envContent = envContent.replace(/TEST_JWT=.*/, `TEST_JWT=${newToken}`);
+                if (process.env.TEST_JWT) {
+                    envContent = envContent.replace(/TEST_JWT=.*/, `TEST_JWT=${newToken}`);
+                } else {
+                    envContent += `\nTEST_JWT=${newToken}`;
+                }
                 needsUpdate = true;
             }
         }
@@ -62,8 +77,12 @@ export async function syncTestEnv() {
             if (doc) {
                 const idStr = doc._id.toString();
                 if (process.env[key] !== idStr) {
-                    const regex = new RegExp(`${key}=.*`);
-                    envContent = envContent.replace(regex, `${key}=${idStr}`);
+                    if (process.env[key]) {
+                        const regex = new RegExp(`${key}=.*`);
+                        envContent = envContent.replace(regex, `${key}=${idStr}`);
+                    } else {
+                        envContent += `\n${key}=${idStr}`;
+                    }
                     needsUpdate = true;
                 }
             }
@@ -72,15 +91,18 @@ export async function syncTestEnv() {
         if (needsUpdate) {
             fs.writeFileSync(envPath, envContent);
             console.log("✅ .env file automatically synchronized with latest DB state.");
+            // Re-load to update process.env
+            dotenv.config({ path: envPath });
         } else {
             console.log("✨ .env file is already up to date.");
         }
 
+        return process.env;
+
     } catch (err) {
         console.error("⚠️ Failed to auto-sync test environment:", err.message);
+        return process.env;
     } finally {
-        // We don't close the connection here if the runner needs it, 
-        // but since runners usually spawn child processes which connect themselves, we can close.
         await mongoose.disconnect();
     }
 }
