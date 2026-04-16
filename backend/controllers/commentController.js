@@ -3,7 +3,7 @@ import Thread from "../models/threadModel.js";
 import { AppError } from "../utils/appError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
-
+import * as notificationService from '../services/notificationService.js';
 // ─────────────────────────────────────────────
 // Helper: build nested comment tree from flat list
 // ─────────────────────────────────────────────
@@ -84,7 +84,16 @@ export const createComment = catchAsync(async (req, res, next) => {
 
     // 6. Increment commentCount on the thread
     await Thread.findByIdAndUpdate(threadId, { $inc: { commentCount: 1 } });
-
+if (thread.author.toString() !== req.user._id.toString()) {
+    await notificationService.notifyThreadOwner({
+        threadId: thread._id,
+        threadOwnerId: thread.author,
+        commenterId: req.user._id,
+        commentId: comment._id,
+        subForumId: thread.subForum,
+        isReply: !!parentCommentId,
+    });
+}
     // 7. Populate author for response
     await comment.populate("author", "name email role avatar");
 
