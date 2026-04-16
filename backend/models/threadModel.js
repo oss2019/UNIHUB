@@ -9,7 +9,10 @@ const threadSchema = new mongoose.Schema({
     tags: [{ type: String }],
     attachments: [{ type: String }],
     commentCount: { type: Number, default: 0 },
-    isPinned: { type: Boolean, default: false }
+    isPinned: { type: Boolean, default: false },
+
+    // Only threads flagged with this will notify alumni (only meaningful in normal forums)
+    notifyAlumni: { type: Boolean, default: false },
 }, { timestamps: true });
 
 threadSchema.index({ subForum: 1, createdAt: -1 });

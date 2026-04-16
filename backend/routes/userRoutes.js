@@ -4,6 +4,7 @@ import {
     getUserProfile,
     updateUserProfile,
 } from "../controllers/userController.js";
+import { getUserThreads } from "../controllers/threadController.js";
 
 const router = express.Router();
 
@@ -12,5 +13,8 @@ router.get("/:id", getUserProfile);
 
 // PATCH /api/users/:id — edit own profile (auth required)
 router.patch("/:id", protect, updateUserProfile);
+
+// GET /api/users/:id/threads — get threads by user ID
+router.get("/:id/threads", getUserThreads);
 
 export default router;
