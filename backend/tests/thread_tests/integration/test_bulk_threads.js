@@ -122,11 +122,11 @@ async function runBulkTests() {
         const stud5 = studentList[4];
 
         // ── 2. FORUMS (5 Total — covering all 4 modes + a second Live) ──
-        const csForum = await Forum.create({ name: 'Computer Science', isApproved: true, isActive: true });
-        const generalForum = await Forum.create({ name: 'General', isApproved: true, isActive: true });
-        const eeForum = await Forum.create({ name: 'Electrical', isApproved: false, isActive: true });
-        const meForum = await Forum.create({ name: 'Mechanical', isApproved: true, isActive: false });
-        const mathForum = await Forum.create({ name: 'Mathematics', isApproved: false, isActive: false });
+        const csForum = await Forum.create({ name: 'Computer Science', isApproved: true, isActive: true, type: 'collab' });
+        const generalForum = await Forum.create({ name: 'General', isApproved: true, isActive: true, type: 'normal' });
+        const eeForum = await Forum.create({ name: 'Electrical', isApproved: false, isActive: true, type: 'normal' });
+        const meForum = await Forum.create({ name: 'Mechanical', isApproved: true, isActive: false, type: 'normal' });
+        const mathForum = await Forum.create({ name: 'Mathematics', isApproved: false, isActive: false, type: 'normal' });
 
         // ── 3. SUBFORUMS (Tags designed with INTRA + INTER overlap) ──
         // CS Forum
@@ -170,117 +170,106 @@ async function runBulkTests() {
 | **Computer Science** | ✅ | ✅ | Live | Web Dev, AI & ML, Cyber Sec | Visible (All Levels) | All Users |
 | **General** | ✅ | ✅ | Live | Events, Careers, Hobbies | Visible (All Levels) | All Users |
 | **Electrical** | ❌ | ✅ | Pending | VLSI, Power Sys | Hidden at List, Visible Individual | Admins Only |
-| **Mechanical** | ✅ | ❌ | Archived | Automobile, Thermo | Visible (All Levels) | Blocked |
-| **Mathematics** | ❌ | ❌ | Dead | Calculus, Algebra | Hidden (Admin Only) | Blocked |
-
-### Tag Map (with Overlaps)
-| SubForum | Tags | Intra-Overlap | Inter-Overlap |
-| :--- | :--- | :--- | :--- |
-| Web Dev (CS) | react, node, python, nextjs | python â†’ AI & ML | python â†’ Careers |
-| AI & ML (CS) | python, pytorch, data | python â†’ Web Dev | data â†’ Calculus, Algebra |
-| Cyber Sec (CS) | security, networking, linux | â€” | networking â†’ Events |
-| Events (General) | fest, hackathon, networking | â€” | networking â†’ Cyber Sec |
-| Careers (General) | placement, resume, python | â€” | python â†’ Web Dev, AI & ML |
-| Hobbies (General) | gaming, music, photography | â€” | â€” |
-| VLSI (EE) | vlsi, verilog, fpga | â€” | â€” |
-| Power Sys (EE) | power, grid, renewable | â€” | â€” |
-| Automobile (ME) | ev, engines, design | design â†’ Thermo | â€” |
-| Thermo (ME) | heat, fluid, design | design â†’ Automobile | â€” |
-| Calculus (Math) | calc, integration, data | data â†’ Algebra | data â†’ AI & ML |
-| Algebra (Math) | linear, matrices, data | data â†’ Calculus | data â†’ AI & ML |
-
----
-
-## 2. Test Execution Log
-
-| Target | Description | Expected Behavior | Actual Outcome |
-| :--- | :--- | :--- | :--- |
-`;
-
-
-        // =====================================================================
-        // SECTION A: Tags Sanitization (6 tests)
-        // =====================================================================
-        console.log("\n--- SECTION A: Tags ---");
-
-        const resA1 = mockRes();
-        await run(createThread, { user: stud1, body: { title: "Tag Check", content: "Body", subForumId: webDevSF._id, tags: [" React ", "react", "Node", ""] } }, resA1);
+| **Mechanical** | �        const resA1 = mockRes();
+        await run(createThread, { user: stud1, body: { title: "Tag Check", content: "Body Content - Long Enough", subForumId: webDevSF._id, tags: [" React ", "react", "Node", ""] } }, resA1);
         const savedTags = resA1.data?.data?.thread?.tags || [];
         logResult("A1 Tag Normalize", "Validates lowercase, trim, dedup.", "['react', 'node']", `[${savedTags}]`, savedTags.length === 2 && savedTags.includes('react'));
 
         const resA2 = mockRes();
-        await run(createThread, { user: stud1, body: { title: "Ghost", content: "Body", subForumId: webDevSF._id, tags: ["   ", ""] } }, resA2);
+        await run(createThread, { user: stud1, body: { title: "Ghost", content: "Body Content - Long Enough", subForumId: webDevSF._id, tags: ["   ", ""] } }, resA2);
         logResult("A2 Ghost Block", "Blocks threads with only whitespace tags.", "400", resA2.error?.statusCode, resA2.error?.statusCode === 400);
 
         const resA3 = mockRes();
-        await run(createThread, { user: stud2, body: { title: "Overlap", content: "Body", subForumId: aiSF._id, tags: ["Python", "PYTHON", "python"] } }, resA3);
+        await run(createThread, { user: stud2, body: { title: "Overlap", content: "Body Content - Long Enough", subForumId: aiSF._id, tags: ["Python", "PYTHON", "python"] } }, resA3);
         const a3Tags = resA3.data?.data?.thread?.tags || [];
         logResult("A3 Dedup Case", "Triples of same tag collapse to one.", "['python']", `[${a3Tags}]`, a3Tags.length === 1);
 
         const resA4 = mockRes();
-        await run(createThread, { user: alum1, body: { title: "Mixed", content: "Body", subForumId: eventSF._id, tags: [" Fest", "hackathon ", " NETWORKING "] } }, resA4);
+        await run(createThread, { user: alum1, body: { title: "Mixed", content: "Body Content - Long Enough", subForumId: eventSF._id, tags: [" Fest", "hackathon ", " NETWORKING "] } }, resA4);
         const a4Tags = resA4.data?.data?.thread?.tags || [];
         logResult("A4 Trim+Lower", "Mixed spacing and casing normalized.", "['fest','hackathon','networking']", `[${a4Tags}]`, a4Tags.length === 3 && a4Tags.includes('networking'));
 
         const resA5 = mockRes();
-        await run(createThread, { user: stud3, body: { title: "No Tags", content: "Body", subForumId: webDevSF._id } }, resA5);
+        await run(createThread, { user: stud3, body: { title: "No Tags", content: "Body Content - Long Enough", subForumId: webDevSF._id } }, resA5);
         logResult("A5 Undefined Tags", "Undefined tags array rejected.", "400", resA5.error?.statusCode, resA5.error?.statusCode === 400);
 
         const resA6 = mockRes();
-        await run(createThread, { user: stud4, body: { title: "Empty Arr", content: "Body", subForumId: webDevSF._id, tags: [] } }, resA6);
+        await run(createThread, { user: stud4, body: { title: "Empty Arr", content: "Body Content - Long Enough", subForumId: webDevSF._id, tags: [] } }, resA6);
         logResult("A6 Empty Array", "Empty tags array rejected.", "400", resA6.error?.statusCode, resA6.error?.statusCode === 400);
 
         const resA7 = mockRes();
-        await run(createThread, { user: stud1, body: { title: "Hyphen Check", content: "Body", subForumId: webDevSF._id, tags: ["Web Dev", "Artificial Intelligence"] } }, resA7);
+        await run(createThread, { user: stud1, body: { title: "Hyphen Check", content: "Body Content - Long Enough", subForumId: webDevSF._id, tags: ["Web Dev", "Artificial Intelligence"] } }, resA7);
         const a7Tags = resA7.data?.data?.thread?.tags || [];
         logResult("A7 Hyphenation (Pass)", "Spaces are safely converted to hyphens.", "['web-dev', 'artificial-intelligence']", `[${a7Tags}]`, a7Tags.includes('web-dev') && a7Tags.includes('artificial-intelligence'));
 
         const resA10 = mockRes();
-        await run(createThread, { user: stud1, body: { title: "Hyphen Multiple Spaces", content: "Body", subForumId: webDevSF._id, tags: ["Machine     Learning", " deep  learning "] } }, resA10);
+        await run(createThread, { user: stud1, body: { title: "Hyphen Multiple Spaces", content: "Body Content - Long Enough", subForumId: webDevSF._id, tags: ["Machine     Learning", " deep  learning "] } }, resA10);
         const a10Tags = resA10.data?.data?.thread?.tags || [];
         logResult("A10 Hyphen Collapse (Edge)", "Multiple consecutive spaces collapse into a single hyphen without duplication.", "['machine-learning', 'deep-learning']", `[${a10Tags}]`, a10Tags.includes('machine-learning') && a10Tags.length === 2);
 
         const resA11 = mockRes();
-        await run(createThread, { user: stud1, body: { title: "Already Hyphenated", content: "Body", subForumId: webDevSF._id, tags: ["react-native", "  vue-js  "] } }, resA11);
+        await run(createThread, { user: stud1, body: { title: "Already Hyphenated", content: "Body Content - Long Enough", subForumId: webDevSF._id, tags: ["react-native", "  vue-js  "] } }, resA11);
         const a11Tags = resA11.data?.data?.thread?.tags || [];
         logResult("A11 Pre-Hyphenated (Pass)", "Tags that already contain hyphens are kept intact without adding extra formatting.", "['react-native', 'vue-js']", `[${a11Tags}]`, a11Tags.includes('react-native'));
 
         const resA8 = mockRes();
-        await run(createThread, { user: stud1, body: { title: "Type Coercion", content: "Body", subForumId: webDevSF._id, tags: [2024, true] } }, resA8);
+        await run(createThread, { user: stud1, body: { title: "Type Coercion", content: "Body Content - Long Enough", subForumId: webDevSF._id, tags: [2024, true] } }, resA8);
         const a8Tags = resA8.data?.data?.thread?.tags || [];
         logResult("A8 Type Safety (Pass)", "Non-string primitive tags are safely converted to strings.", "['2024', 'true']", `[${a8Tags}]`, a8Tags.includes('2024') && a8Tags.includes('true'));
 
         const resA9 = mockRes();
-        await run(createThread, { user: stud4, body: { title: "Null Filtering", content: "Body", subForumId: webDevSF._id, tags: [null, undefined] } }, resA9);
+        await run(createThread, { user: stud4, body: { title: "Null Filtering", content: "Body Content - Long Enough", subForumId: webDevSF._id, tags: [null, undefined] } }, resA9);
         logResult("A9 Null Safety (Fail)", "Threads with only null/undefined tags are filtered out and rejected.", "400", resA9.error?.statusCode, resA9.error?.statusCode === 400);
 
         // =====================================================================
-        // SECTION B: Forum Gates â€” Creation (10 tests)
+        // SECTION B: Forum Gates — Creation (10 tests)
         // =====================================================================
         console.log("\n--- SECTION B: Forum Gates ---");
 
         // Live: CS
         const resB1 = mockRes();
-        await run(createThread, { user: stud1, body: { title: "CS Post", content: "Body", subForumId: webDevSF._id, tags: ['react'] } }, resB1);
+        await run(createThread, { user: stud1, body: { title: "CS Post", content: "Valid Content Over 10 Chars", subForumId: webDevSF._id, tags: ['react'] } }, resB1);
         logResult("B1 Live Student", "Student posts in Live CS forum.", "201", resB1.data?.statusCode || "201", !resB1.error);
 
         const resB2 = mockRes();
-        await run(createThread, { user: alum1, body: { title: "CS Alum", content: "Body", subForumId: aiSF._id, tags: ['pytorch'] } }, resB2);
+        await run(createThread, { user: alum1, body: { title: "CS Alum", content: "Valid Content Over 10 Chars", subForumId: aiSF._id, tags: ['pytorch'] } }, resB2);
         logResult("B2 Live Alumni", "Alumni posts in Live CS forum.", "201", resB2.data?.statusCode || "201", !resB2.error);
 
         // Live: General
         const resB3 = mockRes();
-        await run(createThread, { user: stud5, body: { title: "Gen Post", content: "Body", subForumId: hobSF._id, tags: ['gaming'] } }, resB3);
+        await run(createThread, { user: stud5, body: { title: "Gen Post", content: "Valid Content Over 10 Chars", subForumId: hobSF._id, tags: ['gaming'] } }, resB3);
         logResult("B3 General Student", "Student posts in Live General forum.", "201", resB3.data?.statusCode || "201", !resB3.error);
 
         const resB4 = mockRes();
-        await run(createThread, { user: alum3, body: { title: "Career Post", content: "Body", subForumId: careerSF._id, tags: ['placement'] } }, resB4);
+        await run(createThread, { user: alum3, body: { title: "Career Post", content: "Valid Content Over 10 Chars", subForumId: careerSF._id, tags: ['placement'] } }, resB4);
         logResult("B4 General Alumni", "Alumni posts in Live General forum.", "201", resB4.data?.statusCode || "201", !resB4.error);
 
         // Pending: EE
         const resB5 = mockRes();
-        await run(createThread, { user: stud1, body: { title: "EE Post", content: "Body", subForumId: vlsiSF._id, tags: ['vlsi'] } }, resB5);
+        await run(createThread, { user: stud1, body: { title: "EE Post", content: "Valid Content Over 10 Chars", subForumId: vlsiSF._id, tags: ['vlsi'] } }, resB5);
         logResult("B5 Pending Student", "Student blocked from Pending EE forum.", "403", resB5.error?.statusCode, resB5.error?.statusCode === 403);
+
+        const resB6 = mockRes();
+        await run(createThread, { user: alum2, body: { title: "EE Alum", content: "Valid Content Over 10 Chars", subForumId: powerSF._id, tags: ['power'] } }, resB6);
+        logResult("B6 Pending Alumni", "Alumni blocked from Pending EE forum.", "403", resB6.error?.statusCode, resB6.error?.statusCode === 403);
+
+        const resB7 = mockRes();
+        await run(createThread, { user: admin, body: { title: "Admin EE", content: "Valid Content Over 10 Chars", subForumId: vlsiSF._id, tags: ['fpga'] } }, resB7);
+        logResult("B7 Pending Admin", "Admin overrides Pending gate.", "201", resB7.data?.statusCode || "201", !resB7.error);
+
+        // Archived: ME
+        const resB8 = mockRes();
+        await run(createThread, { user: admin, body: { title: "ME Post", content: "Valid Content Over 10 Chars", subForumId: autoSF._id, tags: ['ev'] } }, resB8);
+        logResult("B8 Archived Admin", "Admin blocked from posting in Archived ME forum.", "403", resB8.error?.statusCode, resB8.error?.statusCode === 403);
+
+        const resB9 = mockRes();
+        await run(createThread, { user: stud3, body: { title: "ME Stud", content: "Valid Content Over 10 Chars", subForumId: thermoSF._id, tags: ['heat'] } }, resB9);
+        logResult("B9 Archived Student", "Student blocked from posting in Archived ME forum.", "403", resB9.error?.statusCode, resB9.error?.statusCode === 403);
+
+        // Dead: Math
+        const resB10 = mockRes();
+        await run(createThread, { user: admin, body: { title: "Math Post", content: "Valid Content Over 10 Chars", subForumId: calcSF._id, tags: ['calc'] } }, resB10);
+        logResult("B10 Dead Admin", "Admin blocked from posting in Dead Math forum.", "403", resB10.error?.statusCode, resB10.error?.statusCode === 403);usCode === 403);
 
         const resB6 = mockRes();
         await run(createThread, { user: alum2, body: { title: "EE Alum", content: "Body", subForumId: powerSF._id, tags: ['power'] } }, resB6);
@@ -450,7 +439,7 @@ async function runBulkTests() {
         console.log("\n--- SECTION E: Pagination ---");
 
         for (let i = 0; i < 22; i++) {
-            await Thread.create({ title: `P${i}`, content: "M", author: stud1._id, subForum: cyberSF._id, forum: csForum._id, tags: ['security'] });
+            await Thread.create({ title: `P${i}`, content: "Valid Pagination Content Over 10 Chars", author: stud1._id, subForum: cyberSF._id, forum: csForum._id, tags: ['security'] });
         }
 
         const resE1 = mockRes();
@@ -559,6 +548,56 @@ async function runBulkTests() {
         logResult("H8 Content Fail Over Limits", "Blocks strictly exceeding limits natively.", "400", errH8?.statusCode, errH8?.statusCode === 400);
 
 
+        // =====================================================================
+        // SECTION I: Mute Logic (2 tests)
+        // =====================================================================
+        console.log("\n--- SECTION I: Mute Logic ---");
+
+        // Manually trigger notification logic within integration suite context
+        // S2 mutes WebDevSF
+        await User.findByIdAndUpdate(stud2._id, { $addToSet: { mutedSubForums: webDevSF._id } });
+        
+        const muteCollabThread = await Thread.create({ 
+            title: "Mute Logic Verification", 
+            content: "Hidden from muted users", 
+            author: stud1._id, 
+            subForum: webDevSF._id, 
+            forum: csForum._id, 
+            tags: ['react'] 
+        });
+
+        const resI1 = mockRes();
+        // Since we are running the controller, it will trigger notificationService internally
+        await run(createThread, { 
+            user: stud1, 
+            body: { 
+                title: "Live Mute Trigger", 
+                content: "Is S2 shielded from this?", 
+                subForumId: webDevSF._id, 
+                tags: ['react'] 
+            } 
+        }, resI1);
+
+        const Notification = mongoose.model('Notification');
+        const s2Notify = await Notification.findOne({ recipient: stud2._id, entityId: resI1.data?.data?.thread?._id });
+        logResult("I1 Mute Isolation", "Muted user correctly skipped during instant collab notification.", "null", s2Notify, s2Notify === null);
+
+        // =====================================================================
+        // SECTION J: User Threads API (2 tests)
+        // =====================================================================
+        console.log("\n--- SECTION J: User Threads API ---");
+        const { getUserThreads } = await import('../../../controllers/threadController.js');
+
+        const resJ1 = mockRes();
+        await run(getUserThreads, { params: { id: stud1._id }, query: { limit: 5 } }, resJ1);
+        const j1Count = resJ1.data?.data?.pagination?.threads?.length;
+        logResult("J1 User Threads Feed", "Fetches threads authored by specific student.", "5", j1Count, j1Count === 5);
+
+        const resJ2 = mockRes();
+        await run(getUserThreads, { params: { id: stud1._id }, query: { limit: 2, page: 1 } }, resJ2);
+        logResult("J2 User Threads Pagination", "Handles pagination params correctly.", "true", resJ2.data?.data?.pagination?.hasMore, resJ2.data?.data?.pagination?.hasMore === true);
+
+
         // Write Final Report
         reportText += reportLog.join('\n');
         reportText += `\n\n### Summary\n- **Total:** ${passedCount + failedCount}\n- **Passed:** ${passedCount}\n- **Failed:** ${failedCount}`;
@@ -572,7 +611,7 @@ async function runBulkTests() {
         process.exit(0);
 
     } catch (err) {
-        console.error("ðŸ’¥ SYSTEM ERROR:", err);
+        console.error("💥 SYSTEM ERROR:", err);
         process.exit(1);
     }
 }

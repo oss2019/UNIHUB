@@ -169,11 +169,10 @@ export const notifyWorkOpportunity = async (workRequest, members) => {
     type: 'WORK_OPPORTUNITY',
     entityId: workRequest._id,
     entityType: 'WorkRequest',
-    message: `New work opportunity: "${workRequest.title}"${
-      workRequest.requiredSkills?.length
-        ? ` — Skills: ${workRequest.requiredSkills.join(', ')}`
-        : ''
-    }`,
+    message: `New work opportunity: "${workRequest.title}"${workRequest.requiredSkills?.length
+      ? ` — Skills: ${workRequest.requiredSkills.join(', ')}`
+      : ''
+      }`,
   }));
 
   await Notification.insertMany(notifications, { ordered: false });

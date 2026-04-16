@@ -55,6 +55,11 @@ export const createThread = catchAsync(async (req, res, next) => {
     // TODO: const mentions = scanForMentions(content);
     // TODO: if(mentions.length > 0) createNotification(...)
 
+    // NOTIFICATION: If forum is collab → instant notify all sub-forum members (students only)
+    if (forum.type === 'collab') {
+        await notificationService.notifySubForumMembers(newThread);
+    }
+
     return sendResponse(res, 201, "success", "thread", newThread);
 });
 

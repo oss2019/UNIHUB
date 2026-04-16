@@ -12,7 +12,6 @@ import subForumRoutes from "./routes/subForumRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js"; // 🔥 IMPORTANT
 import notificationRoutes from "./routes/notificationRoutes.js";
 import workRequestRoutes from "./routes/workRequestRoutes.js";
-import dummyAuthRoutes from "./routes/dummyAuthRoutes.js"; // 🧪 TEMPORARY: Remove after Person A wires getUserThreads
 import './config/scheduler.js'; // Start cron jobs on app boot
 
 import globalErrorHandler from "./controllers/errorController.js";
@@ -58,7 +57,6 @@ app.use("/api", subForumRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api", workRequestRoutes);
-app.use("/api/dummy", dummyAuthRoutes); // 🧪 TEMPORARY: Test getUserThreads
 
 // 404 handler
 app.use((req, res, next) => {
