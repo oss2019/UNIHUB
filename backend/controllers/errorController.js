@@ -7,9 +7,12 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleDuplicateErrorDB = (err) => {
+  const value = Object.entries(err.keyValue || {})
+    .map(([key, val]) => `${key}: ${val}`)
+    .join(', ');
   return new AppError(
     400,
-    `Duplicate field value ${err.keyValue.name}, Please use another value!!` // ! must change based on what is being kept unique
+     `Duplicate field value (${value}). Please use another value!`,
   );
 };
 
