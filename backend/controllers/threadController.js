@@ -89,7 +89,7 @@ export const getSubForumThreads = catchAsync(async (req, res, next) => {
     // Visibility Rules: Archived=all see, Dead=admin only, Pending=admin only at list level
     const forum = await threadService.getForumById(subForum.forum);
     if (!forum || !forum.isApproved) {
-        if (req.user.role !== 'admin') {
+        if (req.user?.role !== 'admin') {
             return sendResponse(res, 200, "success", "pagination", { threads: [], totalCount: 0, hasMore: false }, 0);
         }
     }
@@ -113,7 +113,7 @@ export const getForumThreads = catchAsync(async (req, res, next) => {
     // Visibility Rules: Archived=all see, Dead=admin only, Pending=admin only at list level
     const forum = await threadService.getForumById(req.params.id);
     if (!forum || !forum.isApproved) {
-        if (req.user.role !== 'admin') {
+        if (req.user?.role !== 'admin') {
             return sendResponse(res, 200, "success", "pagination", { threads: [], totalCount: 0, hasMore: false }, 0);
         }
     }
@@ -141,7 +141,7 @@ export const getThread = catchAsync(async (req, res, next) => {
 
     // Dead forums: only admin can view even individual threads
     const forum = await threadService.getForumById(thread.forum);
-    if (forum && !forum.isActive && !forum.isApproved && req.user.role !== 'admin') {
+    if (forum && !forum.isActive && !forum.isApproved && req.user?.role !== 'admin') {
         return next(new AppError(403, "This thread belongs to a deactivated forum"));
     }
 

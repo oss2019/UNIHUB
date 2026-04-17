@@ -28,7 +28,7 @@ app.get("/test", (req, res) => {
 // Middleware
 app.use(
   cors({
-    origin: "*",
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
     credentials: true,
   })
 );
