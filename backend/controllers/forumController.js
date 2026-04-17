@@ -9,7 +9,6 @@ import { escapeRegex } from "../utils/tagUtils.js";
 // GET /api/forums  (public)
 // All active forums with a live sub-forum count attached to each.
 // ─────────────────────────────────────────────────────────────────────────────
-console.log("HIT getAllForums");
 export const getAllForums = catchAsync(async (req, res, next) => {
   const forums = await Forum.find({ isActive: true })
     .populate("createdBy", "name")
@@ -109,15 +108,4 @@ export const deleteForum = catchAsync(async (req, res, next) => {
     undefined,
     `Forum "${forum.name}" has been deactivated.`,
   );
-});
-
-//testing forum
-export const createForum = async (req, res) => {
-  const forum = await Forum.create({
-    name: req.body.name,
-    description: req.body.description,
-    createdBy: null,
-  });
-
-  sendResponse(res, 201, "ok", "forum", forum);
-};
+});

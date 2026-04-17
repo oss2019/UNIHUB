@@ -2,6 +2,7 @@ import Comment from "../models/commentModel.js";
 import Thread from "../models/threadModel.js";
 import { AppError } from "../utils/appError.js";
 import { catchAsync } from "../utils/catchAsync.js";
+import { sendResponse } from "../utils/appResponse.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 import * as notificationService from '../services/notificationService.js';
 // ─────────────────────────────────────────────
@@ -97,11 +98,7 @@ if (thread.author.toString() !== req.user._id.toString()) {
     // 7. Populate author for response
     await comment.populate("author", "name email role avatar");
 
-    res.status(201).json({
-        success: true,
-        message: "Comment created successfully",
-        data: comment,
-    });
+    sendResponse(res, 201, "success", "comment", comment, undefined, "Comment created successfully");
 });
 
 // ─────────────────────────────────────────────
@@ -126,11 +123,7 @@ export const getCommentsByThread = catchAsync(async (req, res, next) => {
     // Build nested tree (top-level + replies)
     const commentTree = buildCommentTree(comments);
 
-    res.status(200).json({
-        success: true,
-        count: comments.length,
-        data: commentTree,
-    });
+    sendResponse(res, 200, "success", "comments", commentTree, comments.length);
 });
 
 // ─────────────────────────────────────────────
@@ -147,10 +140,7 @@ export const getCommentById = catchAsync(async (req, res, next) => {
         return next(new AppError(404, "Comment not found"));
     }
 
-    res.status(200).json({
-        success: true,
-        data: comment,
-    });
+    sendResponse(res, 200, "success", "comment", comment);
 });
 
 // ─────────────────────────────────────────────
@@ -198,11 +188,7 @@ export const updateComment = catchAsync(async (req, res, next) => {
 
     await comment.populate("author", "name email role avatar");
 
-    res.status(200).json({
-        success: true,
-        message: "Comment updated successfully",
-        data: comment,
-    });
+    sendResponse(res, 200, "success", "comment", comment, undefined, "Comment updated successfully");
 });
 
 // ─────────────────────────────────────────────
@@ -221,7 +207,7 @@ export const deleteComment = catchAsync(async (req, res, next) => {
 
     // Only author or admin can delete
     const isAuthor = comment.author.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === "ADMIN";
+    const isAdmin = req.user.role === "admin";
 
     if (!isAuthor && !isAdmin) {
         return next(new AppError(403, "You are not authorized to delete this comment"));
@@ -243,10 +229,7 @@ export const deleteComment = catchAsync(async (req, res, next) => {
     // Decrement commentCount on thread
     await Thread.findByIdAndUpdate(comment.thread, { $inc: { commentCount: -1 } });
 
-    res.status(200).json({
-        success: true,
-        message: "Comment deleted successfully",
-    });
+    sendResponse(res, 200, "success", null, null, undefined, "Comment deleted successfully");
 });
 
 // ─────────────────────────────────────────────
@@ -277,10 +260,7 @@ export const removeAttachment = catchAsync(async (req, res, next) => {
     comment.attachmentPublicId = null;
     await comment.save();
 
-    res.status(200).json({
-        success: true,
-        message: "Attachment removed successfully",
-    });
+    sendResponse(res, 200, "success", null, null, undefined, "Attachment removed successfully");
 });
 
 // ─────────────────────────────────────────────
@@ -304,8 +284,5 @@ export const reportComment = catchAsync(async (req, res, next) => {
 
     await Comment.findByIdAndUpdate(commentId, { $inc: { reportCount: 1 } });
 
-    res.status(200).json({
-        success: true,
-        message: "Comment reported successfully",
-    });
+    sendResponse(res, 200, "success", null, null, undefined, "Comment reported successfully");
 });

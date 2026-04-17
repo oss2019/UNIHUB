@@ -120,6 +120,7 @@ export const reviewForumRequest = catchAsync(async (req, res, next) => {
       description: request.description,
       createdBy: request.requestedBy,
       type: request.type,
+      isApproved: true,
     });
 
     request.forumCreated = forum._id;

@@ -15,12 +15,6 @@ const isAllowedCollegeEmail = (email) => {
 };
 
 
-//checking if the email received from google is from the allowed domain
-
-console.log("Email received from Google:", User.email);
-console.log("Allowed domain:", getAllowedDomain());
-console.log("Is allowed:", isAllowedCollegeEmail(User.email));
-
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
