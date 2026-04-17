@@ -1,0 +1,42 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "node tests/run_all.js",
+    "test:thread_tests": "node tests/thread_tests/run_all.js",
+    "test:thread_tests:integration": "node tests/thread_tests/integration/run_all.js",
+    "test:thread_tests:unit:cloudinary": "node tests/thread_tests/unit/Cloudinary/run_all.js",
+    "test:thread_tests:unit:security": "node tests/thread_tests/unit/Security/run_all.js",
+    "test:thread_tests:unit:tags": "node tests/thread_tests/unit/Tags/run_all.js",
+    "test:thread_tests:unit": "node tests/thread_tests/unit/run_all.js",
+    "dev": "node server.js",
+    "start": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.14.0",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.3",
+    "multer": "^2.1.1",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.5",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
