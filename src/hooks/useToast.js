@@ -1,0 +1,35 @@
+import { useState, useCallback } from 'react';
+
+export default function useToast() {
+  const [toasts, setToasts] = useState([]);
+
+  const addToast = useCallback((message, type = 'info', duration = 3000) => {
+    const id = Math.random().toString(36).slice(2, 11);
+    setToasts((prev) => [...prev, { id, message, type }]);
+
+    if (duration > 0) {
+      setTimeout(() => {
+        removeToast(id);
+      }, duration);
+    }
+
+    return id;
+  }, []);
+
+  const removeToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
+  const success = useCallback((message, duration = 3000) => addToast(message, 'success', duration), [addToast]);
+  const error = useCallback((message, duration = 3000) => addToast(message, 'error', duration), [addToast]);
+  const info = useCallback((message, duration = 3000) => addToast(message, 'info', duration), [addToast]);
+
+  return {
+    toasts,
+    addToast,
+    removeToast,
+    success,
+    error,
+    info,
+  };
+}

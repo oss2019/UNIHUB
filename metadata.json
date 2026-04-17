@@ -1,0 +1,5 @@
+{
+  "name": "Reddit Clone",
+  "description": "A fully functional Reddit clone with subreddits, voting, comments, and dark mode.",
+  "requestFramePermissions": []
+}
