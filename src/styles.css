@@ -160,11 +160,18 @@
     backdrop-filter: blur(16px) saturate(140%);
     -webkit-backdrop-filter: blur(16px) saturate(140%);
   }
+  /* Flatten legacy gradient/glow utilities to solid color */
+  .bg-gradient-primary { background: var(--primary); }
+  .text-gradient {
+    color: var(--primary);
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+  }
+  .shadow-glow { box-shadow: var(--shadow-card); }
   .bg-grid {
-    background-image:
-      linear-gradient(to right, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px);
-    background-size: 32px 32px;
+    background-image: radial-gradient(circle, color-mix(in oklab, var(--border) 80%, transparent) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 }
 
