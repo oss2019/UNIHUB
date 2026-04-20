@@ -9,38 +9,139 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as ComplaintsRouteImport } from './routes/complaints'
+import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FSlugRouteImport } from './routes/f.$slug'
+import { Route as FSlugSubIdRouteImport } from './routes/f.$slug.$subId'
+import { Route as FSlugSubIdThreadIdRouteImport } from './routes/f.$slug.$subId.$threadId'
 
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComplaintsRoute = ComplaintsRouteImport.update({
+  id: '/complaints',
+  path: '/complaints',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarRoute = CalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FSlugRoute = FSlugRouteImport.update({
+  id: '/f/$slug',
+  path: '/f/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FSlugSubIdRoute = FSlugSubIdRouteImport.update({
+  id: '/$subId',
+  path: '/$subId',
+  getParentRoute: () => FSlugRoute,
+} as any)
+const FSlugSubIdThreadIdRoute = FSlugSubIdThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => FSlugSubIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/calendar': typeof CalendarRoute
+  '/complaints': typeof ComplaintsRoute
+  '/resources': typeof ResourcesRoute
+  '/f/$slug': typeof FSlugRouteWithChildren
+  '/f/$slug/$subId': typeof FSlugSubIdRouteWithChildren
+  '/f/$slug/$subId/$threadId': typeof FSlugSubIdThreadIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calendar': typeof CalendarRoute
+  '/complaints': typeof ComplaintsRoute
+  '/resources': typeof ResourcesRoute
+  '/f/$slug': typeof FSlugRouteWithChildren
+  '/f/$slug/$subId': typeof FSlugSubIdRouteWithChildren
+  '/f/$slug/$subId/$threadId': typeof FSlugSubIdThreadIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/calendar': typeof CalendarRoute
+  '/complaints': typeof ComplaintsRoute
+  '/resources': typeof ResourcesRoute
+  '/f/$slug': typeof FSlugRouteWithChildren
+  '/f/$slug/$subId': typeof FSlugSubIdRouteWithChildren
+  '/f/$slug/$subId/$threadId': typeof FSlugSubIdThreadIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/calendar'
+    | '/complaints'
+    | '/resources'
+    | '/f/$slug'
+    | '/f/$slug/$subId'
+    | '/f/$slug/$subId/$threadId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/calendar'
+    | '/complaints'
+    | '/resources'
+    | '/f/$slug'
+    | '/f/$slug/$subId'
+    | '/f/$slug/$subId/$threadId'
+  id:
+    | '__root__'
+    | '/'
+    | '/calendar'
+    | '/complaints'
+    | '/resources'
+    | '/f/$slug'
+    | '/f/$slug/$subId'
+    | '/f/$slug/$subId/$threadId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CalendarRoute: typeof CalendarRoute
+  ComplaintsRoute: typeof ComplaintsRoute
+  ResourcesRoute: typeof ResourcesRoute
+  FSlugRoute: typeof FSlugRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/complaints': {
+      id: '/complaints'
+      path: '/complaints'
+      fullPath: '/complaints'
+      preLoaderRoute: typeof ComplaintsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendar': {
+      id: '/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof CalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +149,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/f/$slug': {
+      id: '/f/$slug'
+      path: '/f/$slug'
+      fullPath: '/f/$slug'
+      preLoaderRoute: typeof FSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/f/$slug/$subId': {
+      id: '/f/$slug/$subId'
+      path: '/$subId'
+      fullPath: '/f/$slug/$subId'
+      preLoaderRoute: typeof FSlugSubIdRouteImport
+      parentRoute: typeof FSlugRoute
+    }
+    '/f/$slug/$subId/$threadId': {
+      id: '/f/$slug/$subId/$threadId'
+      path: '/$threadId'
+      fullPath: '/f/$slug/$subId/$threadId'
+      preLoaderRoute: typeof FSlugSubIdThreadIdRouteImport
+      parentRoute: typeof FSlugSubIdRoute
+    }
   }
 }
 
+interface FSlugSubIdRouteChildren {
+  FSlugSubIdThreadIdRoute: typeof FSlugSubIdThreadIdRoute
+}
+
+const FSlugSubIdRouteChildren: FSlugSubIdRouteChildren = {
+  FSlugSubIdThreadIdRoute: FSlugSubIdThreadIdRoute,
+}
+
+const FSlugSubIdRouteWithChildren = FSlugSubIdRoute._addFileChildren(
+  FSlugSubIdRouteChildren,
+)
+
+interface FSlugRouteChildren {
+  FSlugSubIdRoute: typeof FSlugSubIdRouteWithChildren
+}
+
+const FSlugRouteChildren: FSlugRouteChildren = {
+  FSlugSubIdRoute: FSlugSubIdRouteWithChildren,
+}
+
+const FSlugRouteWithChildren = FSlugRoute._addFileChildren(FSlugRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CalendarRoute: CalendarRoute,
+  ComplaintsRoute: ComplaintsRoute,
+  ResourcesRoute: ResourcesRoute,
+  FSlugRoute: FSlugRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
