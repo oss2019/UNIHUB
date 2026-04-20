@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, Library, Calendar, Flag, Users, TrendingUp, Hash } from "lucide-react";
+import { Home, Library, Calendar, Flag, Users } from "lucide-react";
 import { useStore } from "@/lib/store";
 
 const navItems = [
@@ -57,18 +57,6 @@ export function LeftSidebar() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            <TrendingUp className="h-3.5 w-3.5" /> Trending
-          </div>
-          <ul className="space-y-2 text-sm">
-            {["#midsem", "#sih2026", "#openmic", "#mess", "#hackathon"].map((t) => (
-              <li key={t} className="flex items-center gap-2 text-foreground/80 hover:text-primary cursor-pointer">
-                <Hash className="h-3 w-3 text-primary" /> {t.slice(1)}
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </aside>
   );
