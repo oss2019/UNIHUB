@@ -25,8 +25,7 @@ function Home() {
     <div className="space-y-10">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl border border-border bg-card p-8 md:p-10">
-        <div className="absolute inset-0 bg-grid opacity-30 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)]" />
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl" />
+        <div className="absolute inset-0 bg-grid opacity-40" />
         <div className="relative">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -76,7 +75,7 @@ function Home() {
                 params={{ slug: f.slug }}
                 className="group flex gap-4 p-5 rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-card transition"
               >
-                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary-glow/10 text-3xl">
+                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-primary/10 text-3xl">
                   {f.icon}
                 </div>
                 <div className="flex-1 min-w-0">

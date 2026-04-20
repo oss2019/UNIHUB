@@ -15,11 +15,11 @@ export const Route = createFileRoute("/calendar")({
   }),
 });
 
-const colorByCategory: Record<string, string> = {
-  Culture: "from-pink-500/30 to-purple-500/10",
-  Tech: "from-cyan-500/30 to-blue-500/10",
-  Sports: "from-emerald-500/30 to-teal-500/10",
-  Career: "from-amber-500/30 to-orange-500/10",
+const accentByCategory: Record<string, string> = {
+  Culture: "border-l-rose-500",
+  Tech: "border-l-amber-600",
+  Sports: "border-l-emerald-600",
+  Career: "border-l-yellow-600",
 };
 
 function Calendar() {
@@ -44,9 +44,8 @@ function Calendar() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 hover:border-primary/50 hover:shadow-card transition"
+              className={`group relative overflow-hidden rounded-2xl border border-l-4 border-border bg-card p-5 hover:border-primary/50 hover:shadow-card transition ${accentByCategory[e.category] ?? "border-l-primary"}`}
             >
-              <div className={`absolute inset-0 bg-gradient-to-br ${colorByCategory[e.category] ?? "from-primary/20 to-transparent"} opacity-50`} />
               <div className="relative flex gap-5">
                 <div className="text-center shrink-0">
                   <div className="text-[11px] uppercase font-bold tracking-wider text-primary">{format(date, "MMM")}</div>

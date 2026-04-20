@@ -28,9 +28,8 @@ function ForumPage() {
       </nav>
 
       <header className="rounded-3xl border border-border bg-card p-6 md:p-8 relative overflow-hidden">
-        <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-primary/20 blur-3xl" />
         <div className="relative flex items-start gap-5">
-          <div className="grid h-20 w-20 shrink-0 place-items-center rounded-3xl bg-gradient-to-br from-primary/30 to-primary-glow/10 text-5xl">
+          <div className="grid h-20 w-20 shrink-0 place-items-center rounded-3xl bg-primary/10 text-5xl">
             {forum.icon}
           </div>
           <div className="flex-1">
