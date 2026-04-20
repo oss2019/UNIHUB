@@ -44,9 +44,8 @@ function Calendar() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 hover:border-primary/50 hover:shadow-card transition"
+              className={`group relative overflow-hidden rounded-2xl border border-l-4 border-border bg-card p-5 hover:border-primary/50 hover:shadow-card transition ${accentByCategory[e.category] ?? "border-l-primary"}`}
             >
-              <div className={`absolute inset-0 bg-gradient-to-br ${colorByCategory[e.category] ?? "from-primary/20 to-transparent"} opacity-50`} />
               <div className="relative flex gap-5">
                 <div className="text-center shrink-0">
                   <div className="text-[11px] uppercase font-bold tracking-wider text-primary">{format(date, "MMM")}</div>
