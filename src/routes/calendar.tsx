@@ -15,11 +15,11 @@ export const Route = createFileRoute("/calendar")({
   }),
 });
 
-const colorByCategory: Record<string, string> = {
-  Culture: "from-pink-500/30 to-purple-500/10",
-  Tech: "from-cyan-500/30 to-blue-500/10",
-  Sports: "from-emerald-500/30 to-teal-500/10",
-  Career: "from-amber-500/30 to-orange-500/10",
+const accentByCategory: Record<string, string> = {
+  Culture: "border-l-rose-500",
+  Tech: "border-l-amber-600",
+  Sports: "border-l-emerald-600",
+  Career: "border-l-yellow-600",
 };
 
 function Calendar() {
