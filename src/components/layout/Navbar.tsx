@@ -1,14 +1,16 @@
 import { Link, useLocation } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Bell, Plus, Search, Moon, Sun, Hexagon, Menu } from "lucide-react";
-import { useStore } from "@/lib/store";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useUI } from "@/lib/uiStore";
+import { meQuery, unreadCountQuery } from "@/lib/queries";
+import { Button } from "@/components/ui/button";
 import { MobileDrawer } from "./MobileDrawer";
 
 export function Navbar() {
-  const { user, isDark, toggleDark, setAuthOpen, setCreateOpen, setNotifOpen, unreadCount } =
-    useStore();
-  const unread = unreadCount();
+  const { isDark, toggleDark, setAuthOpen, setCreateOpen, setNotifOpen } = useUI();
+  const { data: user } = useQuery(meQuery());
+  const { data: unread = 0 } = useQuery(unreadCountQuery(!!user));
   const loc = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -25,11 +27,11 @@ export function Navbar() {
           </button>
 
           <Link to="/" className="flex items-center gap-2 font-display">
-            <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-primary shadow-glow">
+            <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-primary">
               <Hexagon className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
             </div>
             <span className="hidden sm:block text-lg font-bold tracking-tight">
-              peer<span className="text-gradient">hive</span>
+              peer<span className="text-primary">hive</span>
             </span>
           </Link>
 
@@ -46,8 +48,11 @@ export function Navbar() {
           <div className="ml-auto flex items-center gap-1.5">
             <Button
               size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="hidden sm:inline-flex bg-gradient-primary text-primary-foreground hover:opacity-90 border-0"
+              onClick={() => {
+                if (!user) return setAuthOpen(true);
+                setCreateOpen(true);
+              }}
+              className="hidden sm:inline-flex bg-primary text-primary-foreground hover:opacity-90 border-0"
             >
               <Plus className="h-4 w-4" /> Post
             </Button>
@@ -59,24 +64,28 @@ export function Navbar() {
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             <button
-              onClick={() => setNotifOpen(true)}
+              onClick={() => (user ? setNotifOpen(true) : setAuthOpen(true))}
               className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-secondary"
               aria-label="Notifications"
             >
               <Bell className="h-4 w-4" />
               {unread > 0 && (
                 <span className="absolute top-1.5 right-1.5 h-4 min-w-4 px-1 rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground grid place-items-center">
-                  {unread}
+                  {unread > 99 ? "99+" : unread}
                 </span>
               )}
             </button>
             {user ? (
               <button
                 onClick={() => setAuthOpen(true)}
-                className="ml-1 grid h-9 w-9 place-items-center rounded-full bg-gradient-primary text-primary-foreground text-sm font-bold ring-2 ring-background hover:ring-primary/40 transition"
+                className="ml-1 grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-bold ring-2 ring-background hover:ring-primary/40 transition overflow-hidden"
                 aria-label="Profile"
               >
-                {user.name.charAt(0)}
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
               </button>
             ) : (
               <Button size="sm" variant="outline" onClick={() => setAuthOpen(true)}>
