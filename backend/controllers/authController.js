@@ -84,30 +84,25 @@ export const googleCallback = catchAsync(async (req, res, next) => {
             // info.message will tell you WHY it failed
             const reason = info?.message || "Authentication failed";
             console.log("Auth failed reason:", reason);
-            
-            
+			clearTokenCookies(res);
+
             return res.redirect(
-                `${process.env.CLIENT_URL}/login?error=${encodeURIComponent(reason)}`
+				`${process.env.CLIENT_URL}?authError=${encodeURIComponent(reason)}`
             );
         }
+
+		if (!isAllowedCollegeEmail(user.email)) {
+			clearTokenCookies(res);
+			return res.redirect(
+				`${process.env.CLIENT_URL}?authError=${encodeURIComponent(`Only @${getAllowedDomain()} emails are allowed`)}`
+			);
+		}
 
         const { accessToken, refreshToken } = generateTokens(user);
         setTokenCookies(res, accessToken, refreshToken);
 
         console.log("Login successful for:", user.email);
-return res.status(200).json({
-    status: "success",
-    message: "Login successful",
-    data: {
-        user: {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-        },
-        accessToken,  // ← copy this value for all Postman requests
-    },
-});
+		return res.redirect(`${process.env.CLIENT_URL}?auth=success`);
 
     })(req, res, next);
 });

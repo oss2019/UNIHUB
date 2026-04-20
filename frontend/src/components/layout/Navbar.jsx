@@ -19,6 +19,7 @@ export default function Navbar({
   setSelectedForumId,
   setSelectedSubforumId,
   onOpenNotifications,
+  currentUser = null,
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -30,7 +31,8 @@ export default function Navbar({
   };
 
   return (
-    <nav className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isDarkMode ? 'border-white/10 bg-slate-950/85' : 'border-slate-200 bg-white/85'}`}>
+    <>
+      <nav className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isDarkMode ? 'border-white/10 bg-slate-950/85' : 'border-slate-200 bg-white/85'}`}>
       <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-3 lg:px-5">
         <button className="flex items-center gap-3 text-left" onClick={onGoHome}>
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-500 text-lg font-semibold text-white">
@@ -60,13 +62,33 @@ export default function Navbar({
             {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
 
-          <button onClick={onOpenLogin} className={`items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors sm:flex ${isDarkMode ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
-            <LogIn className="h-4 w-4" /> Log in
-          </button>
+          {currentUser ? (
+            <button
+              type="button"
+              onClick={onOpenLogin}
+              className={`h-11 w-11 overflow-hidden rounded-full border transition-colors ${isDarkMode ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-slate-200 bg-white hover:bg-slate-50'}`}
+              aria-label="Open profile"
+              title={currentUser.name || currentUser.email}
+            >
+              {currentUser.avatar ? (
+                <img src={currentUser.avatar} alt={currentUser.name || 'Profile'} className="h-full w-full object-cover" />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center text-sm font-semibold">
+                  {(currentUser.name || currentUser.email || 'U').charAt(0).toUpperCase()}
+                </span>
+              )}
+            </button>
+          ) : (
+            <>
+              <button onClick={onOpenLogin} className={`items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors sm:flex ${isDarkMode ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
+                <LogIn className="h-4 w-4" /> Log in
+              </button>
 
-          <button onClick={onOpenSignup} className="items-center gap-2 rounded-full bg-cyan-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-cyan-600 sm:flex">
-            <UserPlus className="h-4 w-4" /> Sign up
-          </button>
+              <button onClick={onOpenSignup} className="items-center gap-2 rounded-full bg-cyan-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-cyan-600 sm:flex">
+                <UserPlus className="h-4 w-4" /> Sign up
+              </button>
+            </>
+          )}
 
           <button
             type="button"
@@ -89,10 +111,12 @@ export default function Navbar({
         </button>
       </div>
 
+      </nav>
+
       {isDrawerOpen && (
-        <div className={`fixed inset-0 z-[60] lg:hidden ${isDarkMode ? 'bg-black/50' : 'bg-black/30'}`} onClick={() => setIsDrawerOpen(false)}>
+        <div className={`fixed inset-0 z-60 lg:hidden ${isDarkMode ? 'bg-black/55' : 'bg-black/35'}`} onClick={() => setIsDrawerOpen(false)}>
           <div
-            className={`absolute right-0 top-0 h-full w-[88vw] max-w-sm overflow-y-auto border-l ${isDarkMode ? 'border-white/10 bg-slate-950' : 'border-slate-200 bg-white'}`}
+            className={`absolute left-0 top-0 h-full w-[78vw] max-w-90 overflow-y-auto border-r shadow-2xl ${isDarkMode ? 'border-white/10 bg-slate-950' : 'border-slate-200 bg-white'}`}
             onClick={(event) => event.stopPropagation()}
           >
             <div className={`flex items-center justify-between border-b px-4 py-4 ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>
@@ -174,14 +198,35 @@ export default function Navbar({
                 <Button variant="ghost" onClick={onToggleTheme} isDarkMode={isDarkMode} className="justify-center">
                   {isDarkMode ? 'Light mode' : 'Dark mode'}
                 </Button>
-                <Button variant="primary" onClick={onOpenSignup} isDarkMode={isDarkMode} className="justify-center">
-                  Sign up
-                </Button>
+                {currentUser ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpenLogin?.();
+                      setIsDrawerOpen(false);
+                    }}
+                    className={`ml-auto h-11 w-11 overflow-hidden rounded-full border transition-colors ${isDarkMode ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-slate-200 bg-white hover:bg-slate-50'}`}
+                    aria-label="Open profile"
+                    title={currentUser.name || currentUser.email}
+                  >
+                    {currentUser.avatar ? (
+                      <img src={currentUser.avatar} alt={currentUser.name || 'Profile'} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-sm font-semibold">
+                        {(currentUser.name || currentUser.email || 'U').charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </button>
+                ) : (
+                  <Button variant="primary" onClick={onOpenSignup} isDarkMode={isDarkMode} className="justify-center">
+                    Sign up
+                  </Button>
+                )}
               </div>
             </div>
           </div>
         </div>
       )}
-    </nav>
+    </>
   );
 }

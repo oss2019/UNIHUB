@@ -8,16 +8,21 @@ const numberFormatter = new Intl.NumberFormat('en', { notation: 'compact', maxim
 
 const formatCount = (value) => numberFormatter.format(value ?? 0);
 
-export default function PostDetailModal({ selectedThread, onClose, isDarkMode, onAddComment }) {
+export default function PostDetailModal({ selectedThread, onClose, isDarkMode, onAddComment, onDeleteThread, currentUser }) {
+  const canDeleteThread =
+    Boolean(currentUser) &&
+    Boolean(selectedThread) &&
+    (currentUser.role === 'admin' || currentUser.id === selectedThread.authorId);
+
   return (
     <AnimatePresence>
       {selectedThread && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 p-4 md:p-10">
+        <div className="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto bg-black/60 p-4 sm:p-6 md:p-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 20 }}
-            className={`relative flex h-full w-full max-w-5xl flex-col overflow-hidden rounded-4xl border ${
+            className={`relative my-auto flex max-h-[calc(100dvh-2rem)] w-full max-w-5xl flex-col overflow-hidden rounded-4xl border sm:max-h-[calc(100dvh-3rem)] md:max-h-[calc(100dvh-5rem)] ${
               isDarkMode ? 'border-white/10 bg-slate-950 text-slate-100' : 'border-slate-200 bg-white text-slate-900'
             }`}
           >
@@ -79,6 +84,15 @@ export default function PostDetailModal({ selectedThread, onClose, isDarkMode, o
                   <span className="flex items-center gap-1">
                     <Share2 className="h-4 w-4" /> Share
                   </span>
+                  {canDeleteThread && (
+                    <button
+                      type="button"
+                      onClick={() => onDeleteThread?.(selectedThread.id)}
+                      className="ml-auto rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-700"
+                    >
+                      Delete thread
+                    </button>
+                  )}
                 </div>
 
                 <div className={`mt-8 border-t pt-6 ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>

@@ -8,6 +8,8 @@ export default function CreatePostModal({ isOpen, onClose, isDarkMode, forums = 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
+  const [notifyAlumni, setNotifyAlumni] = useState(false);
+  const [attachments, setAttachments] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -19,6 +21,8 @@ export default function CreatePostModal({ isOpen, onClose, isDarkMode, forums = 
     setTitle('');
     setContent('');
     setTags('');
+    setNotifyAlumni(false);
+    setAttachments([]);
   }, [isOpen, forums, selectedForumId, selectedSubforumId]);
 
   const selectedForum = useMemo(() => forums.find((forum) => forum.id === forumId) || null, [forums, forumId]);
@@ -68,7 +72,23 @@ export default function CreatePostModal({ isOpen, onClose, isDarkMode, forums = 
     setTitle('');
     setContent('');
     setTags('');
+    setNotifyAlumni(false);
+    setAttachments([]);
     setErrors({});
+  };
+
+  const convertFilesToDataUrls = async (files) => {
+    const fileReaders = files.map(
+      (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error(`Failed to read file: ${file.name}`));
+          reader.readAsDataURL(file);
+        }),
+    );
+
+    return Promise.all(fileReaders);
   };
 
   const handleSubmit = async (event) => {
@@ -76,20 +96,26 @@ export default function CreatePostModal({ isOpen, onClose, isDarkMode, forums = 
     if (!validateForm()) return;
 
     setLoading(true);
-    setTimeout(() => {
-      onSubmit({
+    try {
+      const attachmentDataUrls = attachments.length ? await convertFilesToDataUrls(attachments) : [];
+
+      await onSubmit({
         forumId,
         subforumId,
         title,
         content,
+        notifyAlumni,
+        attachments: attachmentDataUrls,
         tags: tags
           .split(',')
           .map((tag) => tag.trim())
           .filter(Boolean),
       });
-      setLoading(false);
+
       resetForm();
-    }, 350);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -100,12 +126,12 @@ export default function CreatePostModal({ isOpen, onClose, isDarkMode, forums = 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-110 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-110 flex items-center justify-center overflow-y-auto bg-black/60 p-4 sm:p-6 md:p-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
-            className={`w-full max-w-2xl overflow-hidden rounded-3xl border shadow-2xl ${isDarkMode ? 'border-white/10 bg-slate-950' : 'border-slate-200 bg-white'}`}
+            className={`my-auto flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border shadow-2xl sm:max-h-[calc(100dvh-3rem)] md:max-h-[calc(100dvh-5rem)] ${isDarkMode ? 'border-white/10 bg-slate-950' : 'border-slate-200 bg-white'}`}
           >
             <div className={`flex items-center justify-between border-b px-5 py-4 ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>
               <div>
@@ -117,7 +143,7 @@ export default function CreatePostModal({ isOpen, onClose, isDarkMode, forums = 
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 p-5">
+            <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto p-5">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold uppercase tracking-[0.2em] opacity-60">Forum</label>
@@ -220,6 +246,32 @@ export default function CreatePostModal({ isOpen, onClose, isDarkMode, forums = 
                   }`}
                 />
               </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] opacity-60">Attachments</label>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*,.pdf"
+                  onChange={(event) => setAttachments(Array.from(event.target.files || []))}
+                  className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors ${
+                    isDarkMode ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-white'
+                  }`}
+                />
+                {attachments.length > 0 && (
+                  <p className="text-xs opacity-70">{attachments.length} file(s) selected</p>
+                )}
+              </div>
+
+              <label className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium cursor-pointer ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-slate-50'}`}>
+                <input
+                  type="checkbox"
+                  checked={notifyAlumni}
+                  onChange={(event) => setNotifyAlumni(event.target.checked)}
+                  className="h-4 w-4"
+                />
+                Notify alumni for this thread (normal forums only)
+              </label>
 
               <div className={`flex flex-col gap-3 border-t pt-4 sm:flex-row sm:justify-end ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>
                 <button

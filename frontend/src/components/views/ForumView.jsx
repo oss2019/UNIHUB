@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import {
   ArrowRight,
@@ -171,16 +172,45 @@ export default function ForumView({
   topForums,
   communityStats,
   currentUser,
+  selectedSubforumThreads = [],
+  workRequests = [],
+  isSubforumJoined = false,
+  isSubforumMuted = false,
+  onJoinSubforum,
+  onLeaveSubforum,
+  onMuteSubforum,
+  onUnmuteSubforum,
+  onCreateWorkRequest,
   onOpenForum,
   onOpenSubforum,
   onOpenThread,
   onBackToForums,
   onCreateThread,
 }) {
+  const [workRequestTitle, setWorkRequestTitle] = useState('');
+  const [workRequestDescription, setWorkRequestDescription] = useState('');
+  const [workRequestSkills, setWorkRequestSkills] = useState('');
+
   const hasSearch = Boolean(searchQuery?.trim());
-  const forumThreads = selectedForum
-    ? selectedForum.subforums.flatMap((subforum) => subforum.threads.map((thread) => ({ thread, subforum })))
-    : [];
+  const forumThreads = selectedSubforumThreads.map((thread) => ({ thread, subforum: selectedSubforum }));
+
+  const handleCreateWorkRequest = async (event) => {
+    event.preventDefault();
+    if (!selectedSubforum || !workRequestTitle.trim()) return;
+
+    await onCreateWorkRequest?.({
+      title: workRequestTitle.trim(),
+      description: workRequestDescription.trim(),
+      requiredSkills: workRequestSkills
+        .split(',')
+        .map((skill) => skill.trim())
+        .filter(Boolean),
+    });
+
+    setWorkRequestTitle('');
+    setWorkRequestDescription('');
+    setWorkRequestSkills('');
+  };
 
   if (hasSearch) {
     const { matchedForums, matchedSubforums, matchedThreads } = searchResults;
@@ -368,9 +398,29 @@ export default function ForumView({
             <p className="mt-3 max-w-2xl text-sm leading-7 opacity-75 md:text-base">{selectedSubforum.description}</p>
             
           </div>
-          <Button variant="primary" onClick={onCreateThread} isDarkMode={isDarkMode}>
-            Start a thread
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="primary" onClick={onCreateThread} isDarkMode={isDarkMode}>
+              Start a thread
+            </Button>
+            {isSubforumJoined ? (
+              <Button variant="ghost" onClick={onLeaveSubforum} isDarkMode={isDarkMode}>
+                Leave
+              </Button>
+            ) : (
+              <Button variant="ghost" onClick={onJoinSubforum} isDarkMode={isDarkMode}>
+                Join
+              </Button>
+            )}
+            {isSubforumMuted ? (
+              <Button variant="secondary" onClick={onUnmuteSubforum} isDarkMode={isDarkMode}>
+                Unmute
+              </Button>
+            ) : (
+              <Button variant="secondary" onClick={onMuteSubforum} isDarkMode={isDarkMode}>
+                Mute
+              </Button>
+            )}
+          </div>
         </div>
       </Card>
 
@@ -403,6 +453,84 @@ export default function ForumView({
           />
         )}
       </section>
+
+      {selectedForum.type === 'collab' && (
+        <section className="space-y-4">
+          <SectionHeader
+            eyebrow="Work Requests"
+            title="Project collaboration opportunities"
+            description="Collab subforums can broadcast openings to other subforums using work requests."
+          />
+
+          {currentUser && (
+            <Card isDarkMode={isDarkMode} className={`rounded-3xl border p-4 ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-white'}`}>
+              <form onSubmit={handleCreateWorkRequest} className="space-y-3">
+                <input
+                  value={workRequestTitle}
+                  onChange={(event) => setWorkRequestTitle(event.target.value)}
+                  placeholder="Work request title"
+                  className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-white'}`}
+                />
+                <textarea
+                  value={workRequestDescription}
+                  onChange={(event) => setWorkRequestDescription(event.target.value)}
+                  placeholder="Description"
+                  rows={3}
+                  className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-white'}`}
+                />
+                <input
+                  value={workRequestSkills}
+                  onChange={(event) => setWorkRequestSkills(event.target.value)}
+                  placeholder="Required skills (comma-separated)"
+                  className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-white'}`}
+                />
+                <div className="flex justify-end">
+                  <Button type="submit" variant="primary" isDarkMode={isDarkMode}>Create work request</Button>
+                </div>
+              </form>
+            </Card>
+          )}
+
+          <div className="space-y-3">
+            {workRequests.length === 0 ? (
+              <EmptyState
+                isDarkMode={isDarkMode}
+                icon={MessageSquare}
+                title="No work requests yet"
+                description="Create the first collaboration request to reach other subforums."
+              />
+            ) : (
+              workRequests.map((workRequest) => (
+                <Card
+                  key={workRequest.id}
+                  isDarkMode={isDarkMode}
+                  className={`rounded-3xl border p-4 ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-white'}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h4 className="text-base font-semibold">{workRequest.title}</h4>
+                      <p className="mt-1 text-sm opacity-75">{workRequest.description}</p>
+                      <p className="mt-2 text-xs opacity-60">Raised by {workRequest.raisedBy} • {workRequest.createdAt}</p>
+                    </div>
+                    <Badge variant={workRequest.status === 'open' ? 'success' : 'default'} size="xs">
+                      {workRequest.status}
+                    </Badge>
+                  </div>
+                  {workRequest.requiredSkills.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {workRequest.requiredSkills.map((skill) => (
+                        <span key={skill} className={`rounded-full px-3 py-1 text-xs font-medium ${isDarkMode ? 'bg-white/10' : 'bg-slate-100'}`}>
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              ))
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
