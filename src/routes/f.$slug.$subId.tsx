@@ -1,82 +1,184 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useStore } from "@/lib/store";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ChevronRight, Bell, BellOff, Plus, Check, Briefcase } from "lucide-react";
 import { ThreadCard } from "@/components/posts/ThreadCard";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Bell, BellOff, Plus, Check } from "lucide-react";
 import { compact } from "@/lib/format";
+import {
+  meQuery,
+  subforumQuery,
+  threadsBySubforumQuery,
+  workRequestsQuery,
+  qk,
+} from "@/lib/queries";
+import { subforumApi } from "@/lib/api";
+import { useUI } from "@/lib/uiStore";
+import { toast } from "sonner";
+import { WorkRequestPanel } from "@/components/WorkRequestPanel";
 
 export const Route = createFileRoute("/f/$slug/$subId")({
+  loader: ({ context, params }) => {
+    context.queryClient.prefetchQuery(subforumQuery(params.subId));
+    context.queryClient.prefetchQuery(threadsBySubforumQuery(params.subId));
+  },
   component: SubforumPage,
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.subId} — PeerHive` },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "Subforum — PeerHive" }] }),
 });
 
 function SubforumPage() {
   const { slug, subId } = Route.useParams();
-  const { forums, threads, user, joinSubforum, leaveSubforum, muteSubforum, unmuteSubforum, setCreateOpen } = useStore();
-  const forum = forums.find((f) => f.slug === slug);
-  const sub = forum?.subforums.find((s) => s.id === subId);
-  if (!forum || !sub) throw notFound();
+  const { setCreateOpen, setAuthOpen } = useUI();
+  const qc = useQueryClient();
+  const { data: user } = useQuery(meQuery());
+  const { data: sub, isLoading, error } = useQuery(subforumQuery(subId));
+  const { data: paged } = useQuery(threadsBySubforumQuery(subId));
+  const threads = paged?.pagination.threads ?? [];
 
-  const subThreads = threads.filter((t) => t.subforumId === sub.id);
-  const joined = user?.joinedSubForums.includes(sub.id) ?? false;
-  const muted = user?.mutedSubForums.includes(sub.id) ?? false;
+  const parentForum =
+    sub && typeof sub.forum === "object" ? sub.forum : null;
+  const isCollab = false; // we don't get type from subforum endpoint; WorkRequestPanel handles errors gracefully
+  const { data: workRequests = [] } = useQuery({
+    ...workRequestsQuery(subId),
+    enabled: !!user, // only fetch when authed (route is protected)
+  });
+
+  const joined = user?.joinedSubForums?.includes(subId) ?? false;
+  const muted = user?.mutedSubForums?.includes(subId) ?? false;
+
+  const optimisticUser = (mutator: (u: NonNullable<typeof user>) => typeof user) =>
+    qc.setQueryData(qk.me, (prev: any) => (prev ? mutator(prev) : prev));
+
+  const joinMut = useMutation({
+    mutationFn: () => subforumApi.join(subId),
+    onMutate: () => optimisticUser((u) => ({ ...u, joinedSubForums: [...(u.joinedSubForums ?? []), subId] })),
+    onError: (e: Error) => {
+      toast.error(e.message);
+      qc.invalidateQueries({ queryKey: qk.me });
+    },
+    onSuccess: () => toast.success("Joined"),
+  });
+  const leaveMut = useMutation({
+    mutationFn: () => subforumApi.leave(subId),
+    onMutate: () =>
+      optimisticUser((u) => ({ ...u, joinedSubForums: (u.joinedSubForums ?? []).filter((x) => x !== subId) })),
+    onError: (e: Error) => {
+      toast.error(e.message);
+      qc.invalidateQueries({ queryKey: qk.me });
+    },
+    onSuccess: () => toast.success("Left"),
+  });
+  const muteMut = useMutation({
+    mutationFn: () => subforumApi.mute(subId),
+    onMutate: () => optimisticUser((u) => ({ ...u, mutedSubForums: [...(u.mutedSubForums ?? []), subId] })),
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const unmuteMut = useMutation({
+    mutationFn: () => subforumApi.unmute(subId),
+    onMutate: () =>
+      optimisticUser((u) => ({ ...u, mutedSubForums: (u.mutedSubForums ?? []).filter((x) => x !== subId) })),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="h-32 rounded-2xl bg-card border border-border animate-pulse" />
+        <div className="h-24 rounded-2xl bg-card border border-border animate-pulse" />
+      </div>
+    );
+  }
+  if (error || !sub) {
+    return (
+      <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-sm">
+        Couldn't load this subforum. {(error as Error)?.message}
+      </div>
+    );
+  }
+
+  const requireAuth = (fn: () => void) => () => (user ? fn() : setAuthOpen(true));
 
   return (
     <div className="space-y-6">
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
         <Link to="/" className="hover:text-foreground">Home</Link>
         <ChevronRight className="h-3.5 w-3.5" />
-        <Link to="/f/$slug" params={{ slug: forum.slug }} className="hover:text-foreground">{forum.name}</Link>
+        <Link to="/f/$slug" params={{ slug }} className="hover:text-foreground">
+          {parentForum?.name ?? "Forum"}
+        </Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-foreground font-medium">{sub.name}</span>
       </nav>
 
       <header className="rounded-2xl border border-border bg-card p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <h1 className="font-display text-2xl md:text-3xl font-bold">{sub.name}</h1>
-            <p className="text-muted-foreground mt-1 max-w-2xl">{sub.description}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {sub.tags.map((t) => <span key={t} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">#{t}</span>)}
-            </div>
-            <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
-              <span>{compact(sub.members)} members</span>
-              <span>{compact(sub.threadCount)} threads</span>
-              <span className="text-success">{sub.activeNow} active now</span>
-            </div>
+            <p className="text-muted-foreground mt-1 max-w-2xl">{sub.description || "—"}</p>
+            {sub.tags?.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {sub.tags.map((t) => (
+                  <span key={t} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                    #{t}
+                  </span>
+                ))}
+              </div>
+            )}
+            {sub.threadCount !== undefined && (
+              <div className="mt-3 text-xs text-muted-foreground">{compact(sub.threadCount)} threads</div>
+            )}
           </div>
           <div className="flex flex-wrap gap-2">
             {joined ? (
-              <Button variant="outline" size="sm" onClick={() => leaveSubforum(sub.id)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={requireAuth(() => leaveMut.mutate())}
+                disabled={leaveMut.isPending}
+              >
                 <Check className="h-4 w-4" /> Joined
               </Button>
             ) : (
-              <Button size="sm" onClick={() => joinSubforum(sub.id)} className="bg-gradient-primary text-primary-foreground border-0">
+              <Button
+                size="sm"
+                onClick={requireAuth(() => joinMut.mutate())}
+                disabled={joinMut.isPending}
+                className="bg-primary text-primary-foreground border-0"
+              >
                 <Plus className="h-4 w-4" /> Join
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={() => (muted ? unmuteSubforum(sub.id) : muteSubforum(sub.id))}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={requireAuth(() => (muted ? unmuteMut.mutate() : muteMut.mutate()))}
+            >
               {muted ? <BellOff className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
               {muted ? "Muted" : "Mute"}
             </Button>
-            <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Button size="sm" onClick={requireAuth(() => setCreateOpen(true, subId))}>
               <Plus className="h-4 w-4" /> New post
             </Button>
           </div>
         </div>
       </header>
 
+      {user && workRequests.length > 0 && (
+        <section className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Briefcase className="h-4 w-4 text-primary" />
+            <h2 className="font-display font-bold">Work opportunities</h2>
+          </div>
+          <WorkRequestPanel subforumId={subId} requests={workRequests} canCreate={false} />
+        </section>
+      )}
+
       <div className="space-y-3">
-        {subThreads.length === 0 ? (
+        {threads.length === 0 ? (
           <div className="text-center py-16 rounded-2xl border border-dashed border-border">
             <p className="text-muted-foreground">No threads yet. Be the first to post!</p>
           </div>
         ) : (
-          subThreads.map((t, i) => <ThreadCard key={t.id} thread={t} index={i} />)
+          threads.map((t, i) => <ThreadCard key={t._id} thread={t} index={i} />)
         )}
       </div>
     </div>
