@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Home, Library, Calendar, Flag } from "lucide-react";
-import { useStore } from "@/lib/store";
+import { forumsQuery } from "@/lib/queries";
 
 const items = [
   { to: "/", label: "Home", icon: Home },
@@ -11,7 +12,7 @@ const items = [
 ];
 
 export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const forums = useStore((s) => s.forums);
+  const { data: forums = [] } = useQuery(forumsQuery());
   return (
     <AnimatePresence>
       {open && (
@@ -28,7 +29,7 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 260 }}
-            className="fixed top-0 left-0 bottom-0 z-50 w-80 bg-surface border-r border-border p-6 overflow-y-auto md:hidden"
+            className="fixed top-0 left-0 bottom-0 z-50 w-80 bg-card border-r border-border p-6 overflow-y-auto md:hidden"
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-display text-lg font-bold">Menu</h2>
@@ -54,13 +55,13 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
             <div className="space-y-1">
               {forums.map((f) => (
                 <Link
-                  key={f.id}
+                  key={f._id}
                   to="/f/$slug"
-                  params={{ slug: f.slug }}
+                  params={{ slug: f._id }}
                   onClick={onClose}
                   className="flex items-center gap-3 px-3 h-10 rounded-lg text-sm hover:bg-secondary"
                 >
-                  <span>{f.icon}</span> {f.name}
+                  <span>{f.type === "collab" ? "🛠️" : "💬"}</span> {f.name}
                 </Link>
               ))}
             </div>
