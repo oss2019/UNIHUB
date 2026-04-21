@@ -1,18 +1,9 @@
 import jwt from "jsonwebtoken";
 import passport from "passport";
-import { AppError } from "../utils/appError.js";
 import { sendResponse } from "../utils/appResponse.js";
 import { catchAsync } from "../utils/catchAsync.js";
+import { AppError } from "../utils/appError.js";
 
-const getAllowedDomain = () =>
-	(process.env.COLLEGE_EMAIL_DOMAIN || "iitdh.ac.in").replace(/^@/, "").toLowerCase();
-
-const isAllowedCollegeEmail = (email) => {
-	if (!email || typeof email !== "string") return false;
-	const normalizedEmail = email.trim().toLowerCase();
-	const allowedDomain = getAllowedDomain();
-	return normalizedEmail.endsWith(`@${allowedDomain}`);
-};
 
 const generateTokens = (user) => {
 	const accessToken = jwt.sign(
@@ -48,69 +39,48 @@ const clearTokenCookies = (res) => {
 	res.clearCookie("refreshToken", getCookieOptions());
 };
 
-// export const googleCallback = catchAsync(async (req, res, next) => {
-// 	passport.authenticate("google", { session: false }, (err, user) => {
-// 		if (err || !user) {
-// 			clearTokenCookies(res);
-// 			return res.redirect(`${process.env.CLIENT_URL}/login?error=invalid_domain`);
-// 		}
-// 		console.log("User email:", user?.email);
-// 		if (!isAllowedCollegeEmail(user.email)) {
-// 			clearTokenCookies(res);
-// 			return res.redirect(`${process.env.CLIENT_URL}/login?error=invalid_domain`);
-// 		}
-
-// 		const { accessToken, refreshToken } = generateTokens(user);
-// 		setTokenCookies(res, accessToken, refreshToken);
-
-// 		return res.redirect(process.env.CLIENT_URL);
-// 	})(req, res, next);
-// });
-export const googleCallback = catchAsync(async (req, res, next) => {
+// Step 1 of callback — runs passport strategy (domain check + DB upsert).
+// On success, attaches user to req.user and calls next().
+// On failure, redirects to frontend with error reason.
+export const handleGoogleCallback = (req, res, next) => {
     passport.authenticate("google", { session: false }, (err, user, info) => {
-        
-        // Log everything so you can debug
-        console.log("=== Google Callback Debug ===");
-        console.log("err:", err);
-        console.log("user:", user);
-        console.log("info:", info);
-        console.log("=============================");
-
         if (err) {
-            return next(new AppError(500, err.message || "OAuth error"));
+            return next(err); // unexpected server error → global error handler
         }
-
         if (!user) {
-            // info.message will tell you WHY it failed
             const reason = info?.message || "Authentication failed";
-            console.log("Auth failed reason:", reason);
-            
-            
+            console.warn("[Auth] Login rejected:", reason);
             return res.redirect(
                 `${process.env.CLIENT_URL}/login?error=${encodeURIComponent(reason)}`
             );
         }
-
-        const { accessToken, refreshToken } = generateTokens(user);
-        setTokenCookies(res, accessToken, refreshToken);
-
-        console.log("Login successful for:", user.email);
-return res.status(200).json({
-    status: "success",
-    message: "Login successful",
-    data: {
-        user: {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-        },
-        accessToken,  // ← copy this value for all Postman requests
-    },
-});
-
+        req.user = user;
+        return next();
     })(req, res, next);
-});
+};
+
+// Step 2 of callback — passport has already verified the user.
+// This function only issues JWT cookies and responds.
+export const googleCallback = (req, res) => {
+    const { accessToken, refreshToken } = generateTokens(req.user);
+    setTokenCookies(res, accessToken, refreshToken);
+
+    console.log("[Auth] Login successful:", req.user.email, "| role:", req.user.role);
+
+    return res.status(200).json({
+        status: "success",
+        message: "Login successful",
+        data: {
+            user: {
+                id: req.user._id,
+                name: req.user.name,
+                email: req.user.email,
+                role: req.user.role,
+            },
+            accessToken,
+        },
+    });
+};
 
 export const refreshAccessToken = catchAsync(async (req, res, next) => {
 	const refreshToken = req.cookies?.refreshToken;

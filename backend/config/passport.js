@@ -35,19 +35,33 @@ passport.use(
         },
         (accessToken, refreshToken, profile, done) => {
             const email = profile?.emails?.[0]?.value;
+            const allowedDomain = getAllowedDomain();
 
+            // Layer 1: email must exist
             if (!email) {
-                return done(new AppError(400, "Google account email is not available"), null);
-            }
-
-            // Validate email domain
-            if (!isAllowedCollegeEmail(email)) {
                 return done(null, false, {
-                    message: `Only @${getAllowedDomain()} emails are allowed`,
+                    message: "Your Google account does not expose an email address.",
                 });
             }
 
-            // Upsert user by email
+            // Layer 2: Google Workspace hd claim (the hosted domain Google stamps on the token)
+            // This is only present for Google Workspace (G Suite) accounts.
+            // If the college uses Google Workspace with @iitdh.ac.in, this will be set.
+            const hdClaim = profile._json?.hd;
+            if (hdClaim && hdClaim.toLowerCase() !== allowedDomain) {
+                return done(null, false, {
+                    message: `Only @${allowedDomain} Google accounts are allowed.`,
+                });
+            }
+
+            // Layer 3: email domain check — the definitive server-side gate
+            if (!isAllowedCollegeEmail(email)) {
+                return done(null, false, {
+                    message: `Only @${allowedDomain} emails are allowed.`,
+                });
+            }
+
+            // All checks passed — upsert user in MongoDB
             return User.findOneAndUpdate(
                 { email },
                 {
@@ -60,13 +74,13 @@ passport.use(
                     },
                     $setOnInsert: {
                         email,
-                        role: "student",
+                        role: "student", // default role on first login — promote via PATCH /api/users/:id/role
                     },
                 },
                 { upsert: true, new: true, runValidators: true }
             )
                 .then((user) => done(null, user))
-                .catch((err) => done(new AppError(500, err.message), null));
+                .catch((err) => done(err, null));
         }
     )
 );
