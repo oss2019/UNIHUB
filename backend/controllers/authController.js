@@ -120,3 +120,44 @@ export const logout = catchAsync(async (req, res) => {
 export const getMe = catchAsync(async (req, res) => {
 	return sendResponse(res, 200, "success", "user", req.user);
 });
+
+// ─── Dev-only: bypass Google OAuth for teammates testing with existing accounts ───
+export const devLogin = catchAsync(async (req, res, next) => {
+	if (process.env.NODE_ENV !== "development") {
+		return next(new AppError(404, `Could not find ${req.originalUrl} on the server`));
+	}
+
+	const { email } = req.body;
+
+	if (!email) {
+		return next(new AppError(400, "Please provide an email address"));
+	}
+
+	// Import User here to avoid circular dependency issues
+	const { default: User } = await import("../models/userModel.js");
+
+	const user = await User.findOne({ email });
+
+	if (!user) {
+		return next(new AppError(404, "No user found with that email. Create one via GET /auth/google first."));
+	}
+
+	const { accessToken, refreshToken } = generateTokens(user);
+	setTokenCookies(res, accessToken, refreshToken);
+
+	console.log("[Auth] Dev login:", user.email, "| role:", user.role);
+
+	return res.status(200).json({
+		status: "success",
+		message: "Dev login successful",
+		data: {
+			user: {
+				id: user._id,
+				name: user.name,
+				email: user.email,
+				role: user.role,
+			},
+			accessToken,
+		},
+	});
+});
