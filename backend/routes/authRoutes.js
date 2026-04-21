@@ -7,6 +7,7 @@ import {
     refreshAccessToken,
     logout,
     getMe,
+    devLogin,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -33,5 +34,11 @@ router.post("/refresh", refreshAccessToken);
 router.post("/logout", logout);
 
 router.get("/me", protect, getMe);
+
+// Dev-only: login as any existing user by email (no Google OAuth needed)
+// Usage: POST /auth/devLogin { "email": "user@iitdh.ac.in" }
+if (process.env.NODE_ENV === "development") {
+    router.post("/devLogin", devLogin);
+}
 
 export default router;
