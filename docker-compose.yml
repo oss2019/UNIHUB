@@ -43,7 +43,7 @@ services:
       context: ./admin
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:6441}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:6441}
     container_name: app-admin
     restart: unless-stopped
     ports:
