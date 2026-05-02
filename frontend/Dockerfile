@@ -6,8 +6,8 @@ RUN npm ci
 COPY . .
 
 # Build-time env var for the API URL (injected via docker-compose)
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 RUN npm run build
 
