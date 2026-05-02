@@ -66,15 +66,17 @@ services:
       - app-net
 
   # ── Nginx Reverse Proxy ───────────────────────────────────────────────────────
-  nginx:
+    nginx:
     image: nginx:1.25-alpine
     container_name: app-nginx
     restart: unless-stopped
     ports:
-      - "8080:80"       # ready for TLS
+      - "8080:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/certs:/etc/nginx/certs:ro   # mount TLS certs here when ready
+      - type: bind
+        source: ./nignx/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
     depends_on:
       - backend
       - frontend
