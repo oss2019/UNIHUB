@@ -106,10 +106,26 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
 const data = <T>(p: Promise<{ data?: T } | any>): Promise<T> =>
   p.then((r) => (r && r.data ? r.data : r));
 
+const normalizeAuthUser = (payload: any): User => {
+  const rawUser = payload?.user ?? payload ?? {};
+  const avatar =
+    rawUser?.avatar ||
+    payload?.avatar ||
+    rawUser?.picture ||
+    rawUser?.photo ||
+    rawUser?.photoUrl ||
+    "";
+
+  return {
+    ...rawUser,
+    avatar,
+  } as User;
+};
+
 // ───────── Auth ─────────
 export const authApi = {
   googleUrl: () => `${API_BASE}/auth/google`,
-  me: () => data<{ user: User }>(request("/auth/me", { noRefresh: false })).then((d) => d.user),
+  me: () => data<any>(request("/auth/me", { noRefresh: false })).then((d) => normalizeAuthUser(d)),
   refresh: () => request<{ status: string }>("/auth/refresh", { method: "POST", noRefresh: true }),
   logout: () => request<{ status: string }>("/auth/logout", { method: "POST", noRefresh: true }),
 };

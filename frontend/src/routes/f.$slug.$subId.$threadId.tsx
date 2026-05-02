@@ -108,13 +108,13 @@ function ThreadPage() {
               <Pin className="h-3 w-3" /> Pinned
             </span>
           )}
-          <div className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-bold overflow-hidden">
+          {/* <div className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-bold overflow-hidden">
             {thread.author?.avatar ? (
               <img src={thread.author.avatar} alt="" className="h-full w-full object-cover" />
             ) : (
               (thread.author?.name?.charAt(0) ?? "?").toUpperCase()
             )}
-          </div>
+          </div> */}
           <span className="font-medium text-foreground">{thread.author?.name ?? "Unknown"}</span>
           <span>·</span>
           <span>{timeAgo(thread.createdAt)}</span>

@@ -42,13 +42,13 @@ export function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: 
   return (
     <div className={`relative ${depth > 0 ? "pl-4 border-l-2 border-border ml-2" : ""}`}>
       <div className="flex gap-3 py-3">
-        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-bold overflow-hidden">
+        {/* <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-bold overflow-hidden">
           {comment.author?.avatar ? (
             <img src={comment.author.avatar} alt={comment.author.name} className="h-full w-full object-cover" />
           ) : (
             (comment.author?.name?.charAt(0) ?? "?").toUpperCase()
           )}
-        </div>
+        </div> */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
             <span className="font-semibold text-foreground">{comment.author?.name ?? "Unknown"}</span>

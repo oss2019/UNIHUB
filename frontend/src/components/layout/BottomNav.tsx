@@ -1,8 +1,9 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Home, Library, Calendar, Plus } from "lucide-react";
+import { Home, Library, Calendar, Plus, User } from "lucide-react";
 import { useUI } from "@/lib/uiStore";
 import { meQuery } from "@/lib/queries";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const items = [
   { to: "/", label: "Home", icon: Home },
@@ -50,6 +51,26 @@ export function BottomNav() {
             </Link>
           );
         })}
+        <button
+          onClick={() => setAuthOpen(true)}
+          className="flex flex-col items-center justify-center gap-0.5 text-[10px] text-muted-foreground"
+          aria-label={user ? "Profile" : "Sign in"}
+        >
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/10 text-primary overflow-hidden">
+            {user?.avatar ? (
+              <div className = "h-full w-full">
+                  <img className="h-full w-full" src={user.avatar} alt={user.name} />
+                </div>
+            ) : user ? (
+              <span className="text-[11px] font-bold">{user.name.charAt(0).toUpperCase()}</span>
+            ) : (
+              <User className="h-4 w-4" />
+            )}
+          </span>
+
+          
+          {user ? "Profile" : "Sign in"}
+        </button>
       </div>
     </nav>
   );

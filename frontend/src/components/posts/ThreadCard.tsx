@@ -17,13 +17,13 @@ export function ThreadCard({ thread, index = 0 }: { thread: Thread; index?: numb
         className="group block rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-card transition-all p-5"
       >
         <div className="flex items-start gap-4">
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-bold overflow-hidden">
+          {/* <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-bold overflow-hidden">
             {thread.author?.avatar ? (
               <img src={thread.author.avatar} alt={thread.author.name} className="h-full w-full object-cover" />
             ) : (
               (thread.author?.name?.charAt(0) ?? "?").toUpperCase()
             )}
-          </div>
+          </div> */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5 text-xs text-muted-foreground flex-wrap">
               {thread.isPinned && (

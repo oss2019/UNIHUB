@@ -103,7 +103,12 @@ export const getSubForumThreads = catchAsync(async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * limit;
 
-    const { threads, totalCount } = await threadService.getThreadsBySubForumTags(subForum.tags, skip, limit);
+    const { threads, totalCount } = await threadService.getThreadsBySubForum(
+        subForum._id,
+        subForum.tags,
+        skip,
+        limit
+    );
 
     const payload = {
         threads,

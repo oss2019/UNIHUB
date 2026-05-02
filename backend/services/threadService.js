@@ -27,8 +27,11 @@ export const createThread = async (threadData) => {
     return await Thread.create(threadData);
 };
 
-export const getThreadsBySubForumTags = async (tags, skip, limit) => {
-    const filter = { tags: { $in: tags } };
+export const getThreadsBySubForum = async (subForumId, tags, skip, limit) => {
+    const safeTags = Array.isArray(tags) ? tags.filter(Boolean) : [];
+    const filter = safeTags.length
+        ? { $or: [{ subForum: subForumId }, { tags: { $in: safeTags } }] }
+        : { subForum: subForumId };
     const threads = await Thread.find(filter)
         .sort({ isPinned: -1, createdAt: -1 })
         .skip(skip)

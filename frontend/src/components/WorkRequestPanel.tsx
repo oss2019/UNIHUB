@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient, useQueries } from "@tanstack/react-query";
 import { Plus, Briefcase, X, CheckCircle2 } from "lucide-react";
 import type { WorkRequest } from "@/lib/types";
-import { workRequestApi, subforumApi } from "@/lib/api";
+import { forumApi, workRequestApi, subforumApi } from "@/lib/api";
 import { qk } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
 import { timeAgo } from "@/lib/format";
@@ -13,14 +13,25 @@ export function WorkRequestPanel({
   requests,
   canCreate,
   forumId,
+  currentUserId,
 }: {
   subforumId: string;
   requests: WorkRequest[];
   canCreate: boolean;
   /** when canCreate, sibling subforums of the same forum are loaded as targets */
   forumId?: string;
+  currentUserId?: string;
 }) {
+  const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const closeMut = useMutation({
+    mutationFn: (id: string) => workRequestApi.update(id, { status: "closed" }),
+    onSuccess: () => {
+      toast.success("Work request closed");
+      qc.invalidateQueries({ queryKey: qk.workRequests(subforumId) });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <div className="space-y-3">
@@ -73,11 +84,28 @@ export function WorkRequestPanel({
                 <div className="mt-2 text-[11px] text-muted-foreground">
                   by {r.raisedBy.name} · {timeAgo(r.createdAt)}
                 </div>
+                {currentUserId === r.raisedBy._id && r.status === "open" && (
+                  <div className="mt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => closeMut.mutate(r._id)}
+                      disabled={closeMut.isPending}
+                    >
+                      Close request
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </li>
         ))}
       </ul>
+      {requests.length === 0 && (
+        <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+          No open work requests yet.
+        </div>
+      )}
     </div>
   );
 }
@@ -92,17 +120,29 @@ function CreateWorkRequestForm({
   onDone: () => void;
 }) {
   const qc = useQueryClient();
-  const { data: siblings = [] } = useQuery({
-    queryKey: ["subforums", "byForum", forumId],
-    queryFn: () => subforumApi.byForum(forumId),
+  const { data: forums = [] } = useQuery({
+    queryKey: qk.forums,
+    queryFn: () => forumApi.list(),
   });
-  const targetable = siblings.filter((s) => s._id !== subforumId);
+  const subforumLists = useQueries({
+    queries: forums.map((f) => ({
+      queryKey: qk.subforumsByForum(f._id),
+      queryFn: () => subforumApi.byForum(f._id),
+      enabled: !!f._id,
+    })),
+  });
+  const allSubforums = subforumLists.flatMap((q) => q.data ?? []);
+  const forumNameById = new Map(forums.map((f) => [f._id, f.name]));
+  const targetable = allSubforums.filter((s) => s._id !== subforumId);
 
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [skillInput, setSkillInput] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [targets, setTargets] = useState<string[]>(targetable.map((s) => s._id));
+  useEffect(() => {
+    setTargets((prev) => (prev.length > 0 ? prev : targetable.map((s) => s._id)));
+  }, [targetable]);
 
   const mut = useMutation({
     mutationFn: () =>
@@ -188,6 +228,10 @@ function CreateWorkRequestForm({
           )}
           {targetable.map((s) => {
             const on = targets.includes(s._id);
+            const forumRef = typeof s.forum === "string" ? s.forum : s.forum?._id;
+            const forumName =
+              (typeof s.forum === "object" && s.forum?.name) ||
+              (forumRef ? forumNameById.get(forumRef) : undefined);
             return (
               <button
                 key={s._id}
@@ -197,6 +241,7 @@ function CreateWorkRequestForm({
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs ${on ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground"}`}
               >
                 {on && <CheckCircle2 className="h-3 w-3" />} {s.name}
+                {forumName ? ` (${forumName})` : ""}
               </button>
             );
           })}

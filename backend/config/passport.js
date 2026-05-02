@@ -35,6 +35,20 @@ passport.use(
         },
         (accessToken, refreshToken, profile, done) => {
             const email = profile?.emails?.[0]?.value;
+            const avatarFromGoogle =
+                profile?.photos?.[0]?.value ||
+                profile?._json?.picture ||
+                "";
+            const setFields = {
+                googleId: profile.id,
+                name: profile.displayName,
+                isVerified: true,
+                lastActive: new Date(),
+            };
+
+            if (avatarFromGoogle) {
+                setFields.avatar = avatarFromGoogle;
+            }
 
             if (!email) {
                 return done(new AppError(400, "Google account email is not available"), null);
@@ -51,13 +65,7 @@ passport.use(
             return User.findOneAndUpdate(
                 { email },
                 {
-                    $set: {
-                        googleId: profile.id,
-                        name: profile.displayName,
-                        avatar: profile.photos[0]?.value || "",
-                        isVerified: true,
-                        lastActive: new Date(),
-                    },
+                    $set: setFields,
                     $setOnInsert: {
                         email,
                         role: "student",
