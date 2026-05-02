@@ -1,27 +1,18 @@
-# ─── docker-compose.yml ───────────────────────────────────────────────────────
-# Usage:
-#   Development:  docker compose up --build
-#   Production:   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-
 services:
 
-  # ── Node.js Backend ──────────────────────────────────────────────────────────
   backend:
     build:
-      context: ./backend        # ← point to your backend folder
+      context: ./backend
       dockerfile: Dockerfile
     container_name: app-backend
     restart: unless-stopped
     ports:
-      - "6441:6441"             # exposed for direct debugging; remove in prod
+      - "6441:6441"
     environment:
       NODE_ENV: production
       PORT: 6441
-      # Add your own env vars below (or use an .env file)
-      # DATABASE_URL: ${DATABASE_URL}
-      # JWT_SECRET: ${JWT_SECRET}
     env_file:
-      - .env                    # put secrets here – never commit this file
+      - ./backend/.env
     networks:
       - app-net
     healthcheck:
@@ -31,10 +22,9 @@ services:
       retries: 3
       start_period: 20s
 
-  # ── React/Vite Frontend ───────────────────────────────────────────────────────
   frontend:
     build:
-      context: ./frontend       # ← point to your frontend folder
+      context: ./frontend
       dockerfile: Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:6441}
@@ -48,10 +38,9 @@ services:
     networks:
       - app-net
 
-  # ── React/Vite Admin Panel ────────────────────────────────────────────────────
   admin:
     build:
-      context: ./admin          # ← point to your admin folder
+      context: ./admin
       dockerfile: Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:6441}
@@ -65,8 +54,7 @@ services:
     networks:
       - app-net
 
-  # ── Nginx Reverse Proxy ───────────────────────────────────────────────────────
-    nginx:
+  nginx:
     image: nginx:1.25-alpine
     container_name: app-nginx
     restart: unless-stopped
