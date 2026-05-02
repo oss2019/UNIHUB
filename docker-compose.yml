@@ -1,0 +1,89 @@
+# ─── docker-compose.yml ───────────────────────────────────────────────────────
+# Usage:
+#   Development:  docker compose up --build
+#   Production:   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+
+  # ── Node.js Backend ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend        # ← point to your backend folder
+      dockerfile: Dockerfile
+    container_name: app-backend
+    restart: unless-stopped
+    ports:
+      - "6441:6441"             # exposed for direct debugging; remove in prod
+    environment:
+      NODE_ENV: production
+      PORT: 6441
+      # Add your own env vars below (or use an .env file)
+      # DATABASE_URL: ${DATABASE_URL}
+      # JWT_SECRET: ${JWT_SECRET}
+    env_file:
+      - .env                    # put secrets here – never commit this file
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:6441/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ── React/Vite Frontend ───────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend       # ← point to your frontend folder
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:6441}
+    container_name: app-frontend
+    restart: unless-stopped
+    ports:
+      - "6442:6442"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  # ── React/Vite Admin Panel ────────────────────────────────────────────────────
+  admin:
+    build:
+      context: ./admin          # ← point to your admin folder
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:6441}
+    container_name: app-admin
+    restart: unless-stopped
+    ports:
+      - "6443:6443"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  # ── Nginx Reverse Proxy ───────────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: app-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "3000:3000"              # ready for TLS
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro   # mount TLS certs here when ready
+    depends_on:
+      - backend
+      - frontend
+      - admin
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
