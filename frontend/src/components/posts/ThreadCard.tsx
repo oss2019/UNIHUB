@@ -4,7 +4,13 @@ import { MessageCircle, Pin, Tag } from "lucide-react";
 import type { Thread } from "@/lib/types";
 import { timeAgo, compact } from "@/lib/format";
 
-export function ThreadCard({ thread, index = 0 }: { thread: Thread; index?: number }) {
+export function ThreadCard({
+  thread,
+  index = 0,
+}: {
+  thread: Thread;
+  index?: number;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -30,7 +36,9 @@ export function ThreadCard({ thread, index = 0 }: { thread: Thread; index?: numb
                   <Pin className="h-3 w-3" /> Pinned
                 </span>
               )}
-              <span className="font-medium text-foreground">{thread.author?.name ?? "Unknown"}</span>
+              <span className="font-medium text-foreground">
+                {thread.author?.name ?? "Unknown"}
+              </span>
               <span>·</span>
               <span>{timeAgo(thread.createdAt)}</span>
               {thread.author?.role && thread.author.role !== "student" && (
@@ -47,13 +55,17 @@ export function ThreadCard({ thread, index = 0 }: { thread: Thread; index?: numb
             </p>
             <div className="flex flex-wrap items-center gap-3 mt-3">
               {thread.tags?.slice(0, 3).map((t) => (
-                <span key={t} className="inline-flex items-center gap-1 text-xs text-primary">
+                <span
+                  key={t}
+                  className="inline-flex items-center gap-1 text-xs text-primary"
+                >
                   <Tag className="h-3 w-3" /> {t}
                 </span>
               ))}
               <span className="ml-auto inline-flex items-center gap-3 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1">
-                  <MessageCircle className="h-3.5 w-3.5" /> {compact(thread.commentCount ?? 0)}
+                  <MessageCircle className="h-3.5 w-3.5" />{" "}
+                  {compact(thread.commentCount ?? 0)}
                 </span>
               </span>
             </div>

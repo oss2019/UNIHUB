@@ -23,6 +23,9 @@ export const useUI = create<UI>((set) => ({
   toggleDark: () => set((s) => ({ isDark: !s.isDark })),
   setAuthOpen: (v) => set({ authOpen: v }),
   setCreateOpen: (v, defaultSubforumId = null) =>
-    set({ createOpen: v, createDefaultSubforumId: v ? defaultSubforumId : null }),
+    set({
+      createOpen: v,
+      createDefaultSubforumId: v ? defaultSubforumId : null,
+    }),
   setNotifOpen: (v) => set({ notifOpen: v }),
 }));

@@ -58,17 +58,22 @@ export function BottomNav() {
         >
           <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/10 text-primary overflow-hidden">
             {user?.avatar ? (
-              <div className = "h-full w-full">
-                  <img className="h-full w-full" src={user.avatar} alt={user.name} />
-                </div>
+              <div className="h-full w-full">
+                <img
+                  className="h-full w-full"
+                  src={user.avatar}
+                  alt={user.name}
+                />
+              </div>
             ) : user ? (
-              <span className="text-[11px] font-bold">{user.name.charAt(0).toUpperCase()}</span>
+              <span className="text-[11px] font-bold">
+                {user.name.charAt(0).toUpperCase()}
+              </span>
             ) : (
               <User className="h-4 w-4" />
             )}
           </span>
 
-          
           {user ? "Profile" : "Sign in"}
         </button>
       </div>

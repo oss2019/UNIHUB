@@ -2,7 +2,15 @@ import { useUI } from "@/lib/uiStore";
 import { Modal } from "../Modal";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Bell, AtSign, Sparkles, CheckCheck, Trash2, MessageSquare, Briefcase } from "lucide-react";
+import {
+  Bell,
+  AtSign,
+  Sparkles,
+  CheckCheck,
+  Trash2,
+  MessageSquare,
+  Briefcase,
+} from "lucide-react";
 import { timeAgo } from "@/lib/format";
 import { meQuery, notificationsQuery, qk } from "@/lib/queries";
 import { notificationApi, threadApi } from "@/lib/api";
@@ -10,10 +18,16 @@ import { toast } from "sonner";
 import type { NotificationType } from "@/lib/types";
 
 const iconFor = (t: NotificationType) => {
-  if (t === "COMMENT_ON_THREAD" || t === "REPLY_TO_COMMENT") return MessageSquare;
+  if (t === "COMMENT_ON_THREAD" || t === "REPLY_TO_COMMENT")
+    return MessageSquare;
   if (t === "MENTION") return AtSign;
   if (t === "WORK_OPPORTUNITY") return Briefcase;
-  if (t === "WEEKLY_DIGEST" || t === "FORTNIGHTLY_DIGEST" || t === "THRESHOLD_EMAIL") return Sparkles;
+  if (
+    t === "WEEKLY_DIGEST" ||
+    t === "FORTNIGHTLY_DIGEST" ||
+    t === "THRESHOLD_EMAIL"
+  )
+    return Sparkles;
   return Bell;
 };
 
@@ -22,7 +36,9 @@ export function NotificationsModal() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { data: user } = useQuery(meQuery());
-  const { data: notifications = [], isLoading } = useQuery(notificationsQuery(notifOpen && !!user));
+  const { data: notifications = [], isLoading } = useQuery(
+    notificationsQuery(notifOpen && !!user),
+  );
 
   const readMut = useMutation({
     mutationFn: (id: string) => notificationApi.readOne(id),
@@ -74,7 +90,12 @@ export function NotificationsModal() {
   const unread = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <Modal open={notifOpen} onClose={() => setNotifOpen(false)} title="Notifications" maxWidth="max-w-md">
+    <Modal
+      open={notifOpen}
+      onClose={() => setNotifOpen(false)}
+      title="Notifications"
+      maxWidth="max-w-md"
+    >
       <div className="px-6 py-3 flex items-center justify-between border-b border-border">
         <span className="text-xs text-muted-foreground">{unread} unread</span>
         <button
@@ -87,10 +108,14 @@ export function NotificationsModal() {
       </div>
       <ul className="divide-y divide-border">
         {isLoading && (
-          <li className="p-10 text-center text-sm text-muted-foreground">Loading…</li>
+          <li className="p-10 text-center text-sm text-muted-foreground">
+            Loading…
+          </li>
         )}
         {!isLoading && notifications.length === 0 && (
-          <li className="p-10 text-center text-sm text-muted-foreground">You're all caught up ✨</li>
+          <li className="p-10 text-center text-sm text-muted-foreground">
+            You're all caught up ✨
+          </li>
         )}
         {notifications.map((n) => {
           const Icon = iconFor(n.type);
@@ -105,10 +130,14 @@ export function NotificationsModal() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm">
-                  {n.sender?.name && <span className="font-semibold">{n.sender.name} </span>}
+                  {n.sender?.name && (
+                    <span className="font-semibold">{n.sender.name} </span>
+                  )}
                   <span className="text-foreground/80">{n.message}</span>
                 </p>
-                <span className="text-[11px] text-muted-foreground">{timeAgo(n.createdAt)}</span>
+                <span className="text-[11px] text-muted-foreground">
+                  {timeAgo(n.createdAt)}
+                </span>
               </div>
               <button
                 onClick={(e) => {
@@ -119,7 +148,9 @@ export function NotificationsModal() {
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
-              {!n.isRead && <span className="self-center h-2 w-2 rounded-full bg-primary" />}
+              {!n.isRead && (
+                <span className="self-center h-2 w-2 rounded-full bg-primary" />
+              )}
             </li>
           );
         })}

@@ -10,7 +10,13 @@ const items = [
   { to: "/calendar", label: "Calendar", icon: Calendar },
 ];
 
-export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function MobileDrawer({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const { data: forums = [] } = useQuery(forumsQuery());
   return (
     <AnimatePresence>
@@ -32,7 +38,10 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-display text-lg font-bold">Menu</h2>
-              <button onClick={onClose} className="p-2 rounded-lg hover:bg-secondary">
+              <button
+                onClick={onClose}
+                className="p-2 rounded-lg hover:bg-secondary"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>

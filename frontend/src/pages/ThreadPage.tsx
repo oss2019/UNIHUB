@@ -35,7 +35,9 @@ export function ThreadPage() {
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
-    document.title = thread?.title ? `${thread.title} — PeerHive` : "Thread — PeerHive";
+    document.title = thread?.title
+      ? `${thread.title} — PeerHive`
+      : "Thread — PeerHive";
   }, [thread?.title]);
 
   const commentMut = useMutation({
@@ -88,7 +90,8 @@ export function ThreadPage() {
     commentMut.mutate();
   };
 
-  const canDelete = user && (user.role === "admin" || user._id === thread.author?._id);
+  const canDelete =
+    user && (user.role === "admin" || user._id === thread.author?._id);
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -113,7 +116,9 @@ export function ThreadPage() {
               <Pin className="h-3 w-3" /> Pinned
             </span>
           )}
-          <span className="font-medium text-foreground">{thread.author?.name ?? "Unknown"}</span>
+          <span className="font-medium text-foreground">
+            {thread.author?.name ?? "Unknown"}
+          </span>
           <span>·</span>
           <span>{timeAgo(thread.createdAt)}</span>
           {canDelete && (
@@ -127,15 +132,29 @@ export function ThreadPage() {
             </button>
           )}
         </div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight">{thread.title}</h1>
+        <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight">
+          {thread.title}
+        </h1>
         <div className="mt-4 prose prose-sm dark:prose-invert max-w-none">
-          <p className="text-foreground/90 whitespace-pre-wrap leading-relaxed">{thread.content}</p>
+          <p className="text-foreground/90 whitespace-pre-wrap leading-relaxed">
+            {thread.content}
+          </p>
         </div>
         {thread.attachments?.length > 0 && (
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
             {thread.attachments.map((a, i) => (
-              <a key={i} href={a} target="_blank" rel="noreferrer" className="block">
-                <img src={a} alt={`attachment ${i + 1}`} className="rounded-lg border border-border" />
+              <a
+                key={i}
+                href={a}
+                target="_blank"
+                rel="noreferrer"
+                className="block"
+              >
+                <img
+                  src={a}
+                  alt={`attachment ${i + 1}`}
+                  className="rounded-lg border border-border"
+                />
               </a>
             ))}
           </div>
@@ -213,7 +232,9 @@ export function ThreadPage() {
         </h2>
         <div className="rounded-2xl border border-border bg-card divide-y divide-border">
           {comments.length === 0 ? (
-            <div className="p-10 text-center text-muted-foreground text-sm">Be the first to reply.</div>
+            <div className="p-10 text-center text-muted-foreground text-sm">
+              Be the first to reply.
+            </div>
           ) : (
             <div className="px-5">
               {comments.map((c) => (

@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient, useQueries } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useQueries,
+} from "@tanstack/react-query";
 import { Plus, Briefcase, X, CheckCircle2 } from "lucide-react";
 import type { WorkRequest } from "@/lib/types";
 import { forumApi, workRequestApi, subforumApi } from "@/lib/api";
@@ -37,8 +42,16 @@ export function WorkRequestPanel({
     <div className="space-y-3">
       {canCreate && (
         <div className="flex justify-end">
-          <Button size="sm" variant="outline" onClick={() => setShowForm((v) => !v)}>
-            {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}{" "}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowForm((v) => !v)}
+          >
+            {showForm ? (
+              <X className="h-4 w-4" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}{" "}
             {showForm ? "Cancel" : "Raise work request"}
           </Button>
         </div>
@@ -67,7 +80,9 @@ export function WorkRequestPanel({
                   </span>
                 </div>
                 {r.description && (
-                  <p className="text-sm text-muted-foreground mt-1">{r.description}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {r.description}
+                  </p>
                 )}
                 {r.requiredSkills.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
@@ -139,9 +154,13 @@ function CreateWorkRequestForm({
   const [desc, setDesc] = useState("");
   const [skillInput, setSkillInput] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
-  const [targets, setTargets] = useState<string[]>(targetable.map((s) => s._id));
+  const [targets, setTargets] = useState<string[]>(
+    targetable.map((s) => s._id),
+  );
   useEffect(() => {
-    setTargets((prev) => (prev.length > 0 ? prev : targetable.map((s) => s._id)));
+    setTargets((prev) =>
+      prev.length > 0 ? prev : targetable.map((s) => s._id),
+    );
   }, [targetable]);
 
   const mut = useMutation({
@@ -197,7 +216,10 @@ function CreateWorkRequestForm({
         </div>
         <div className="flex flex-wrap gap-1.5 mb-2">
           {skills.map((s) => (
-            <span key={s} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/15 text-primary text-xs">
+            <span
+              key={s}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/15 text-primary text-xs"
+            >
               {s}
               <button onClick={() => setSkills(skills.filter((x) => x !== s))}>
                 <X className="h-3 w-3" />
@@ -224,11 +246,14 @@ function CreateWorkRequestForm({
         </div>
         <div className="flex flex-wrap gap-1.5">
           {targetable.length === 0 && (
-            <span className="text-xs text-muted-foreground">No sibling subforums in this forum.</span>
+            <span className="text-xs text-muted-foreground">
+              No sibling subforums in this forum.
+            </span>
           )}
           {targetable.map((s) => {
             const on = targets.includes(s._id);
-            const forumRef = typeof s.forum === "string" ? s.forum : s.forum?._id;
+            const forumRef =
+              typeof s.forum === "string" ? s.forum : s.forum?._id;
             const forumName =
               (typeof s.forum === "object" && s.forum?.name) ||
               (forumRef ? forumNameById.get(forumRef) : undefined);
@@ -236,7 +261,11 @@ function CreateWorkRequestForm({
               <button
                 key={s._id}
                 onClick={() =>
-                  setTargets(on ? targets.filter((x) => x !== s._id) : [...targets, s._id])
+                  setTargets(
+                    on
+                      ? targets.filter((x) => x !== s._id)
+                      : [...targets, s._id],
+                  )
                 }
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs ${on ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground"}`}
               >

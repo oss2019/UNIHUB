@@ -15,7 +15,8 @@ export const qk = {
   me: ["me"] as const,
   forums: ["forums"] as const,
   forum: (id: string) => ["forum", id] as const,
-  subforumsByForum: (forumId: string) => ["subforums", "forum", forumId] as const,
+  subforumsByForum: (forumId: string) =>
+    ["subforums", "forum", forumId] as const,
   subforum: (id: string) => ["subforum", id] as const,
   threadsBySubforum: (id: string) => ["threads", "sub", id] as const,
   threadsByForum: (id: string) => ["threads", "forum", id] as const,

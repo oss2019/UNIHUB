@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-    base: '/peerhive/',
+  base: "/peerhive/",
   plugins: [react(), tailwindcss(), tsconfigPaths()],
   server: {
     port: 6442,

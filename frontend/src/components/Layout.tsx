@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Toaster, toast } from "sonner";
 import { useEffect } from "react";
@@ -14,12 +14,25 @@ import { meQuery } from "@/lib/queries";
 function AuthBootstrap() {
   // Trigger /auth/me on mount so cookies are validated and user is cached.
   const me = useQuery(meQuery());
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (
+      me.data &&
+      !me.data.onboardingCompleted &&
+      location.pathname !== "/onboarding"
+    ) {
+      navigate("/onboarding", { replace: true });
+    }
+  }, [me.data, location.pathname, navigate]);
 
   // Handle ?auth=success / ?authError=... after Google OAuth redirect
   useEffect(() => {
     const url = new URL(window.location.href);
     const ok = url.searchParams.get("auth");
-    const err = url.searchParams.get("authError") || url.searchParams.get("error");
+    const err =
+      url.searchParams.get("authError") || url.searchParams.get("error");
     if (ok === "success") {
       me.refetch();
       toast.success("Signed in successfully");
@@ -31,7 +44,11 @@ function AuthBootstrap() {
       url.searchParams.delete("auth");
       url.searchParams.delete("authError");
       url.searchParams.delete("error");
-      window.history.replaceState({}, "", url.pathname + (url.search ? url.search : ""));
+      window.history.replaceState(
+        {},
+        "",
+        url.pathname + (url.search ? url.search : ""),
+      );
     }
   }, []);
 

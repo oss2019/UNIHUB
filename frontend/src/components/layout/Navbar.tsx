@@ -10,7 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MobileDrawer } from "./MobileDrawer";
 
 export function Navbar() {
-  const { isDark, toggleDark, setAuthOpen, setCreateOpen, setNotifOpen } = useUI();
+  const { isDark, toggleDark, setAuthOpen, setCreateOpen, setNotifOpen } =
+    useUI();
   const { data: user } = useQuery(meQuery());
   const { data: unread = 0 } = useQuery(unreadCountQuery(!!user));
   const loc = useLocation();
@@ -40,7 +41,10 @@ export function Navbar() {
 
           <Link to="/" className="flex items-center gap-2 font-display">
             <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-primary">
-              <Hexagon className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
+              <Hexagon
+                className="h-5 w-5 text-primary-foreground"
+                strokeWidth={2.5}
+              />
             </div>
             <span className="hidden sm:block text-lg font-bold tracking-tight">
               peer<span className="text-primary">hive</span>
@@ -59,9 +63,13 @@ export function Navbar() {
               {showSearchPanel && (
                 <div className="absolute z-50 mt-2 w-full rounded-xl border border-border bg-card shadow-card overflow-hidden">
                   {isSearching ? (
-                    <div className="px-3 py-2 text-xs text-muted-foreground">Searching…</div>
+                    <div className="px-3 py-2 text-xs text-muted-foreground">
+                      Searching…
+                    </div>
                   ) : searchResults.length === 0 ? (
-                    <div className="px-3 py-2 text-xs text-muted-foreground">No threads found</div>
+                    <div className="px-3 py-2 text-xs text-muted-foreground">
+                      No threads found
+                    </div>
                   ) : (
                     <div className="max-h-80 overflow-auto">
                       {searchResults.map((thread) => (
@@ -71,7 +79,9 @@ export function Navbar() {
                           onClick={() => setSearchText("")}
                           className="block px-3 py-2 hover:bg-secondary"
                         >
-                          <p className="text-sm font-medium line-clamp-1">{thread.title}</p>
+                          <p className="text-sm font-medium line-clamp-1">
+                            {thread.title}
+                          </p>
                           <p className="text-xs text-muted-foreground line-clamp-1">
                             {thread.author?.name ?? "Unknown"}
                           </p>
@@ -100,7 +110,11 @@ export function Navbar() {
               className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-secondary"
               aria-label="Toggle theme"
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDark ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
             </button>
             <button
               onClick={() => (user ? setNotifOpen(true) : setAuthOpen(true))}
@@ -120,12 +134,21 @@ export function Navbar() {
                 className="ml-1 hidden md:grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-bold ring-2 ring-background hover:ring-primary/40 transition overflow-hidden"
                 aria-label="Profile"
               >
-                <div className = "h-full w-full">
-                  <img className="h-full w-full" src={user.avatar} alt={user.name} />
+                <div className="h-full w-full">
+                  <img
+                    className="h-full w-full"
+                    src={user.avatar}
+                    alt={user.name}
+                  />
                 </div>
               </button>
             ) : (
-              <Button size="sm" variant="outline" onClick={() => setAuthOpen(true)} className="hidden md:inline-flex">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setAuthOpen(true)}
+                className="hidden md:inline-flex"
+              >
                 Sign in
               </Button>
             )}
@@ -144,9 +167,13 @@ export function Navbar() {
               {showSearchPanel && (
                 <div className="absolute z-50 mt-2 w-full rounded-xl border border-border bg-card shadow-card overflow-hidden">
                   {isSearching ? (
-                    <div className="px-3 py-2 text-xs text-muted-foreground">Searching…</div>
+                    <div className="px-3 py-2 text-xs text-muted-foreground">
+                      Searching…
+                    </div>
                   ) : searchResults.length === 0 ? (
-                    <div className="px-3 py-2 text-xs text-muted-foreground">No threads found</div>
+                    <div className="px-3 py-2 text-xs text-muted-foreground">
+                      No threads found
+                    </div>
                   ) : (
                     <div className="max-h-80 overflow-auto">
                       {searchResults.map((thread) => (
@@ -156,7 +183,9 @@ export function Navbar() {
                           onClick={() => setSearchText("")}
                           className="block px-3 py-2 hover:bg-secondary"
                         >
-                          <p className="text-sm font-medium line-clamp-1">{thread.title}</p>
+                          <p className="text-sm font-medium line-clamp-1">
+                            {thread.title}
+                          </p>
                           <p className="text-xs text-muted-foreground line-clamp-1">
                             {thread.author?.name ?? "Unknown"}
                           </p>

@@ -40,15 +40,22 @@ export function AuthModal() {
           <div className="flex items-center gap-4">
             <div className="grid h-16 w-16 place-items-center rounded-2xl bg-primary text-2xl font-bold text-primary-foreground overflow-hidden">
               {user.avatar ? (
-                <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 user.name.charAt(0).toUpperCase()
               )}
             </div>
             <div className="min-w-0">
-              <div className="font-display font-bold text-lg truncate">{user.name}</div>
+              <div className="font-display font-bold text-lg truncate">
+                {user.name}
+              </div>
               <div className="text-sm text-muted-foreground flex items-center gap-1.5 truncate">
-                <Mail className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{user.email}</span>
+                <Mail className="h-3.5 w-3.5 shrink-0" />{" "}
+                <span className="truncate">{user.email}</span>
               </div>
             </div>
           </div>
@@ -76,14 +83,15 @@ export function AuthModal() {
             disabled={logoutMut.isPending}
             className="w-full"
           >
-            <LogOut className="h-4 w-4" /> {logoutMut.isPending ? "Signing out…" : "Sign out"}
+            <LogOut className="h-4 w-4" />{" "}
+            {logoutMut.isPending ? "Signing out…" : "Sign out"}
           </Button>
         </div>
       ) : (
         <div className="p-6 space-y-5 text-center">
           <p className="text-sm text-muted-foreground">
-            Sign in with your <strong>@iitdh.ac.in</strong> Google account to post, comment and join
-            subforums.
+            Sign in with your <strong>@iitdh.ac.in</strong> Google account to
+            post, comment and join subforums.
           </p>
           <Button
             onClick={goLogin}
@@ -94,7 +102,9 @@ export function AuthModal() {
           <p className="text-[11px] text-muted-foreground">
             You'll be redirected to Google, then back to PeerHive.
           </p>
-          <p className="text-[11px] text-muted-foreground/70">API: {API_BASE}</p>
+          <p className="text-[11px] text-muted-foreground/70">
+            API: {API_BASE}
+          </p>
         </div>
       )}
     </Modal>
@@ -105,7 +115,9 @@ function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-xl bg-secondary p-3">
       <div className="text-lg font-display font-bold capitalize">{value}</div>
-      <div className="text-[11px] uppercase text-muted-foreground tracking-wider">{label}</div>
+      <div className="text-[11px] uppercase text-muted-foreground tracking-wider">
+        {label}
+      </div>
     </div>
   );
 }

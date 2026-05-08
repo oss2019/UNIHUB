@@ -29,7 +29,8 @@ export function HomePage() {
               <Sparkles className="h-3.5 w-3.5" /> The IIT Dharwad community
             </span>
             <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]">
-              Where campus <span className="text-primary">meets, talks, and builds</span>.
+              Where campus{" "}
+              <span className="text-primary">meets, talks, and builds</span>.
             </h1>
             <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-xl">
               {user
@@ -61,13 +62,18 @@ export function HomePage() {
         <div className="flex items-end justify-between mb-4">
           <div>
             <h2 className="font-display text-2xl font-bold">Forums</h2>
-            <p className="text-sm text-muted-foreground">Pick a space to dive in.</p>
+            <p className="text-sm text-muted-foreground">
+              Pick a space to dive in.
+            </p>
           </div>
         </div>
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-32 rounded-2xl bg-card border border-border animate-pulse" />
+              <div
+                key={i}
+                className="h-32 rounded-2xl bg-card border border-border animate-pulse"
+              />
             ))}
           </div>
         ) : forums.length === 0 ? (

@@ -55,3 +55,26 @@ export const updateUserProfile = catchAsync(async (req, res, next) => {
 
     return sendResponse(res, 200, "success", "user", user);
 });
+
+// POST /api/users/onboard — complete onboarding and join subforums
+export const onboardUser = catchAsync(async (req, res, next) => {
+    const { branch, joinedSubForums } = req.body;
+
+    const updates = { onboardingCompleted: true };
+    if (branch) updates.branch = branch;
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: updates,
+            $addToSet: { joinedSubForums: { $each: joinedSubForums || [] } }
+        },
+        { new: true, runValidators: true }
+    ).select("-googleId -__v");
+
+    if (!user) {
+        return next(new AppError(404, "User not found"));
+    }
+
+    return sendResponse(res, 200, "success", "user", user);
+});

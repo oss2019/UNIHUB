@@ -7,7 +7,13 @@ import { commentApi } from "@/lib/api";
 import { qk } from "@/lib/queries";
 import { toast } from "sonner";
 
-export function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: number }) {
+export function CommentItem({
+  comment,
+  depth = 0,
+}: {
+  comment: Comment;
+  depth?: number;
+}) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -37,10 +43,14 @@ export function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: 
   };
 
   const cap = depth >= 4;
-  const isImage = comment.attachments && /\.(png|jpe?g|gif|webp)(\?|$)/i.test(comment.attachments);
+  const isImage =
+    comment.attachments &&
+    /\.(png|jpe?g|gif|webp)(\?|$)/i.test(comment.attachments);
 
   return (
-    <div className={`relative ${depth > 0 ? "pl-4 border-l-2 border-border ml-2" : ""}`}>
+    <div
+      className={`relative ${depth > 0 ? "pl-4 border-l-2 border-border ml-2" : ""}`}
+    >
       <div className="flex gap-3 py-3">
         {/* <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-bold overflow-hidden">
           {comment.author?.avatar ? (
@@ -51,11 +61,15 @@ export function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: 
         </div> */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-            <span className="font-semibold text-foreground">{comment.author?.name ?? "Unknown"}</span>
+            <span className="font-semibold text-foreground">
+              {comment.author?.name ?? "Unknown"}
+            </span>
             <span>·</span>
             <span>{timeAgo(comment.createdAt)}</span>
           </div>
-          <p className="text-sm text-foreground/90 whitespace-pre-wrap">{comment.content}</p>
+          <p className="text-sm text-foreground/90 whitespace-pre-wrap">
+            {comment.content}
+          </p>
           {comment.attachments && (
             <div className="mt-2">
               {isImage ? (

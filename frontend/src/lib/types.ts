@@ -21,6 +21,7 @@ export type User = {
   joinedSubForums?: string[];
   mutedSubForums?: string[];
   joinedForums?: string[];
+  onboardingCompleted?: boolean;
 };
 
 export type Forum = {
@@ -67,7 +68,13 @@ export type Thread = {
 export type Comment = {
   _id: string;
   content: string;
-  author: { _id: string; name: string; email?: string; role?: Role; avatar?: string };
+  author: {
+    _id: string;
+    name: string;
+    email?: string;
+    role?: Role;
+    avatar?: string;
+  };
   thread: string;
   parentComment: string | null;
   isDeleted: boolean;

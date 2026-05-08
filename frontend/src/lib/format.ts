@@ -9,4 +9,7 @@ export const timeAgo = (iso: string) => {
 };
 
 export const compact = (n: number) =>
-  Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+  Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(n);

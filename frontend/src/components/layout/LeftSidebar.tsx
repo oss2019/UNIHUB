@@ -41,7 +41,9 @@ export function LeftSidebar() {
           </div>
           <div className="space-y-0.5">
             {forums.length === 0 && (
-              <p className="px-3 text-xs text-muted-foreground">No forums yet.</p>
+              <p className="px-3 text-xs text-muted-foreground">
+                No forums yet.
+              </p>
             )}
             {forums.map((f) => (
               <Link
@@ -49,7 +51,9 @@ export function LeftSidebar() {
                 to={`/f/${f._id}`}
                 className="flex items-center gap-3 px-3 h-9 rounded-lg text-sm text-foreground/80 hover:bg-secondary hover:text-foreground transition group"
               >
-                <span className="text-base">{f.type === "collab" ? "🛠️" : "💬"}</span>
+                <span className="text-base">
+                  {f.type === "collab" ? "🛠️" : "💬"}
+                </span>
                 <span className="truncate">{f.name}</span>
                 <span className="ml-auto text-[10px] text-muted-foreground group-hover:text-foreground">
                   {f.subForumCount ?? 0}

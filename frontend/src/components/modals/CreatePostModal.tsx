@@ -48,7 +48,10 @@ export function CreatePostModal() {
     if (!subs.find((s) => s._id === subforumId)) setSubforumId(subs[0]._id);
   }, [subs, subforumId]);
 
-  const selectedForum = useMemo(() => forums.find((f) => f._id === forumId), [forums, forumId]);
+  const selectedForum = useMemo(
+    () => forums.find((f) => f._id === forumId),
+    [forums, forumId],
+  );
 
   const addTag = () => {
     const t = tagInput.trim().toLowerCase().replace(/^#/, "");
@@ -66,7 +69,9 @@ export function CreatePostModal() {
 
   const createMut = useMutation({
     mutationFn: async () => {
-      const attachments = files.length ? await Promise.all(files.map(fileToDataURL)) : undefined;
+      const attachments = files.length
+        ? await Promise.all(files.map(fileToDataURL))
+        : undefined;
       return threadApi.create({
         title: title.trim(),
         content: content.trim(),
@@ -89,7 +94,9 @@ export function CreatePostModal() {
 
   const submit = () => {
     if (!title.trim() || !content.trim() || !subforumId || tags.length === 0) {
-      toast.error("Title, content, subforum, and at least one tag are required.");
+      toast.error(
+        "Title, content, subforum, and at least one tag are required.",
+      );
       return;
     }
     createMut.mutate();
@@ -195,7 +202,9 @@ export function CreatePostModal() {
             />
           </label>
           {files.length > 0 && (
-            <p className="text-xs text-muted-foreground mt-1">{files.length} file(s) selected</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {files.length} file(s) selected
+            </p>
           )}
         </Field>
 
@@ -207,7 +216,8 @@ export function CreatePostModal() {
               onChange={(e) => setNotify(e.target.checked)}
               className="accent-primary"
             />
-            <Bell className="h-3.5 w-3.5 text-muted-foreground" /> Notify alumni in this subforum
+            <Bell className="h-3.5 w-3.5 text-muted-foreground" /> Notify alumni
+            in this subforum
           </label>
         )}
 
@@ -228,7 +238,13 @@ export function CreatePostModal() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">

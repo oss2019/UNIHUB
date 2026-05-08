@@ -37,7 +37,9 @@ export function ForumPage() {
       }),
     onSuccess: (res: any) => {
       const createdDirectly = Boolean(res?.subForum);
-      toast.success(createdDirectly ? "Subforum created." : "Subforum request submitted.");
+      toast.success(
+        createdDirectly ? "Subforum created." : "Subforum request submitted.",
+      );
       qc.invalidateQueries({ queryKey: qk.forum(slug!) });
       resetForm();
       setOpenCreate(false);
@@ -51,7 +53,10 @@ export function ForumPage() {
         <div className="h-32 rounded-3xl bg-card border border-border animate-pulse" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-28 rounded-2xl bg-card border border-border animate-pulse" />
+            <div
+              key={i}
+              className="h-28 rounded-2xl bg-card border border-border animate-pulse"
+            />
           ))}
         </div>
       </div>
@@ -75,7 +80,8 @@ export function ForumPage() {
 
   const addTag = () => {
     const t = tagInput.trim().toLowerCase().replace(/^#/, "");
-    if (t && !tags.includes(t) && tags.length < 8) setTags((prev) => [...prev, t]);
+    if (t && !tags.includes(t) && tags.length < 8)
+      setTags((prev) => [...prev, t]);
     setTagInput("");
   };
 
@@ -113,15 +119,22 @@ export function ForumPage() {
             <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-secondary text-muted-foreground">
               {forum.type}
             </span>
-            <h1 className="font-display text-3xl font-bold mt-1">{forum.name}</h1>
-            <p className="text-muted-foreground mt-1 max-w-2xl">{forum.description || "—"}</p>
+            <h1 className="font-display text-3xl font-bold mt-1">
+              {forum.name}
+            </h1>
+            <p className="text-muted-foreground mt-1 max-w-2xl">
+              {forum.description || "—"}
+            </p>
             <div className="mt-4 flex gap-5 text-sm">
               <span className="inline-flex items-center gap-1.5">
-                <Users className="h-4 w-4 text-primary" /> {subForums.length} subforums
+                <Users className="h-4 w-4 text-primary" /> {subForums.length}{" "}
+                subforums
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <MessageSquare className="h-4 w-4 text-primary" />{" "}
-                {forum.createdBy?.name ? `by ${forum.createdBy.name}` : "Community"}
+                {forum.createdBy?.name
+                  ? `by ${forum.createdBy.name}`
+                  : "Community"}
               </span>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">{helperText}</p>
@@ -159,7 +172,9 @@ export function ForumPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="font-display font-bold group-hover:text-primary truncate">{s.name}</h3>
+                      <h3 className="font-display font-bold group-hover:text-primary truncate">
+                        {s.name}
+                      </h3>
                       <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
                         {s.description || "—"}
                       </p>
@@ -184,7 +199,12 @@ export function ForumPage() {
         )}
       </section>
 
-      <Modal open={openCreate} onClose={() => setOpenCreate(false)} title={submitLabel} maxWidth="max-w-xl">
+      <Modal
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+        title={submitLabel}
+        maxWidth="max-w-xl"
+      >
         <div className="p-6 space-y-4">
           <label className="block">
             <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
