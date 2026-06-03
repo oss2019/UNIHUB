@@ -247,7 +247,7 @@ export function SubforumPage() {
             </p>
           </div>
         ) : (
-          threads.map((t, i) => <ThreadCard key={t._id} thread={t} index={i} />)
+          threads.map((t: any, i: any) => <ThreadCard key={t._id} thread={t} index={i} />)
         )}
       </div>
     </div>
