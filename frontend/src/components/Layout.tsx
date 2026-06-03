@@ -10,6 +10,8 @@ import { AuthModal } from "@/components/modals/AuthModal";
 import { CreatePostModal } from "@/components/modals/CreatePostModal";
 import { NotificationsModal } from "@/components/modals/NotificationsModal";
 import { meQuery } from "@/lib/queries";
+import { TutorialTour } from "@/components/TutorialTour";
+import { useTourStore } from "@/lib/tourStore";
 
 function AuthBootstrap() {
   // Trigger /auth/me on mount so cookies are validated and user is cached.
@@ -26,6 +28,22 @@ function AuthBootstrap() {
       navigate("/onboarding", { replace: true });
     }
   }, [me.data, location.pathname, navigate]);
+
+  const startTour = useTourStore((s) => s.startTour);
+  const isTourActive = useTourStore((s) => s.isActive);
+
+  useEffect(() => {
+    if (
+      me.data &&
+      me.data.onboardingCompleted &&
+      location.pathname === "/" &&
+      window.innerWidth >= 1024 &&
+      !localStorage.getItem("ph_tour_completed") &&
+      !isTourActive
+    ) {
+      startTour();
+    }
+  }, [me, location.pathname, startTour, isTourActive]);
 
   // Handle ?auth=success / ?authError=... after Google OAuth redirect
   useEffect(() => {
@@ -50,7 +68,7 @@ function AuthBootstrap() {
         url.pathname + (url.search ? url.search : ""),
       );
     }
-  }, []);
+  }, [me]);
 
   return null;
 }
@@ -71,6 +89,7 @@ export function Layout() {
       <AuthModal />
       <CreatePostModal />
       <NotificationsModal />
+      <TutorialTour />
       <Toaster richColors position="top-right" theme="dark" />
     </div>
   );

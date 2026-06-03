@@ -1,4 +1,9 @@
-export type ResourceCategory = "course-material" | "lab-manual" | "project" | "placement" | "other";
+export type ResourceCategory =
+  | "course-material"
+  | "lab-manual"
+  | "project"
+  | "placement"
+  | "other";
 export type ResourceFileType = "PDF" | "ZIP" | "Link" | "GitHub" | "Drive";
 
 export interface Resource {
@@ -27,7 +32,8 @@ export const initialResources: Resource[] = [
   {
     _id: "res-ma101-1",
     title: "Calculus (MA-101) Complete Lecture Notes",
-    description: "Handwritten comprehensive notes covering limits, derivatives, integration, and multivariate calculus, matching the first-semester syllabus.",
+    description:
+      "Handwritten comprehensive notes covering limits, derivatives, integration, and multivariate calculus, matching the first-semester syllabus.",
     category: "course-material",
     tags: ["calculus", "notes", "math", "first-year"],
     url: "https://drive.google.com/drive/folders/sample-ma101",
@@ -47,7 +53,8 @@ export const initialResources: Resource[] = [
   {
     _id: "res-ma201-1",
     title: "Linear Algebra & Complex Analysis Formula Cheatsheet",
-    description: "A quick 4-page reference sheet with all important equations, eigenvalues, Taylor series, and residue theorems for mid-sems and end-sems.",
+    description:
+      "A quick 4-page reference sheet with all important equations, eigenvalues, Taylor series, and residue theorems for mid-sems and end-sems.",
     category: "course-material",
     tags: ["cheatsheet", "formulas", "linear-algebra", "complex-analysis"],
     url: "https://example.com/resources/ma201-cheatsheet.pdf",
@@ -67,7 +74,8 @@ export const initialResources: Resource[] = [
   {
     _id: "res-cs201-1",
     title: "Data Structures & Algorithms - Lab Manual & Solutions",
-    description: "Contains all problem statements and optimized C++ templates for Stack, Queue, BST, Heap, and Graph algorithms from CS-201 lab sessions.",
+    description:
+      "Contains all problem statements and optimized C++ templates for Stack, Queue, BST, Heap, and Graph algorithms from CS-201 lab sessions.",
     category: "lab-manual",
     tags: ["dsa", "cpp", "lab-manual", "graphs", "trees"],
     url: "https://github.com/iitdh-student-hub/cs201-dsa-labs",
@@ -87,7 +95,8 @@ export const initialResources: Resource[] = [
   {
     _id: "res-cs301-1",
     title: "Machine Learning (CS-301) Course Project: Sentiment Analyzer",
-    description: "End-to-end Python code using PyTorch and HuggingFace Transformers for fine-tuning DistilBERT on student feedback datasets. Includes training logs.",
+    description:
+      "End-to-end Python code using PyTorch and HuggingFace Transformers for fine-tuning DistilBERT on student feedback datasets. Includes training logs.",
     category: "project",
     tags: ["ml", "nlp", "pytorch", "bert", "python"],
     url: "https://github.com/iitdh-student-hub/student-sentiment-bert",
@@ -106,8 +115,10 @@ export const initialResources: Resource[] = [
   },
   {
     _id: "res-ee101-1",
-    title: "Basic Electrical Systems (EE-101) Solved Previous Year Question Papers",
-    description: "Step-by-step solutions for End-Semester papers from 2022, 2023, and 2024. Ideal for practicing circuit analysis and AC networks.",
+    title:
+      "Basic Electrical Systems (EE-101) Solved Previous Year Question Papers",
+    description:
+      "Step-by-step solutions for End-Semester papers from 2022, 2023, and 2024. Ideal for practicing circuit analysis and AC networks.",
     category: "course-material",
     tags: ["pyq", "solved-papers", "circuits", "first-year"],
     url: "https://example.com/resources/ee101-pyqs.pdf",
@@ -127,7 +138,8 @@ export const initialResources: Resource[] = [
   {
     _id: "res-ee204-1",
     title: "Signals and Systems MATLAB Simulation Lab Report",
-    description: "MATLAB scripts and fully completed reports for Fourier transform simulations, filter designs, and convolution operations.",
+    description:
+      "MATLAB scripts and fully completed reports for Fourier transform simulations, filter designs, and convolution operations.",
     category: "lab-manual",
     tags: ["matlab", "signals", "fourier", "simulation"],
     url: "https://example.com/resources/ee204-matlab-lab.zip",
@@ -147,7 +159,8 @@ export const initialResources: Resource[] = [
   {
     _id: "res-me201-1",
     title: "Thermodynamics (ME-201) Practice Problems & Solutions",
-    description: "Comprehensive problem set with detailed hand-worked solutions for energy balances, heat engines, entropy, and cycle analyses.",
+    description:
+      "Comprehensive problem set with detailed hand-worked solutions for energy balances, heat engines, entropy, and cycle analyses.",
     category: "course-material",
     tags: ["thermodynamics", "solved-problems", "physics", "entropy"],
     url: "https://example.com/resources/me201-thermo-problems.pdf",
@@ -167,7 +180,8 @@ export const initialResources: Resource[] = [
   {
     _id: "res-placement-1",
     title: "Technical Interview Prep Guide - IIT Dharwad Placement Cell",
-    description: "Curated compilation of interview questions asked by visiting companies (Google, Microsoft, Sprinklr, etc.) at IIT Dharwad. Covers DSA, System Design, and OS.",
+    description:
+      "Curated compilation of interview questions asked by visiting companies (Google, Microsoft, Sprinklr, etc.) at IIT Dharwad. Covers DSA, System Design, and OS.",
     category: "placement",
     tags: ["placement-prep", "interview-questions", "dsa", "resume"],
     url: "https://drive.google.com/file/d/sample-placement-guide/view",
@@ -187,7 +201,8 @@ export const initialResources: Resource[] = [
   {
     _id: "res-hs102-1",
     title: "Professional Communication (HS-102) Presentation Template",
-    description: "A professional and modern Google Slides template aligned with the guidelines of HS-102 course for semester presentation assignments.",
+    description:
+      "A professional and modern Google Slides template aligned with the guidelines of HS-102 course for semester presentation assignments.",
     category: "other",
     tags: ["presentation", "template", "slides", "first-year"],
     url: "https://docs.google.com/presentation/d/sample-hs102-template/edit",
@@ -203,5 +218,5 @@ export const initialResources: Resource[] = [
     downloadsCount: 65,
     upvotesCount: 12,
     createdAt: "2026-01-25T13:20:00Z",
-  }
+  },
 ];

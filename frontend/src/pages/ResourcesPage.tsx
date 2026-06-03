@@ -25,26 +25,40 @@ import {
   ShieldCheck,
   UserCheck,
   X,
-  Gauge
+  Gauge,
 } from "lucide-react";
 import { meQuery } from "@/lib/queries";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/Modal";
 import { Badge } from "@/components/ui/badge";
-import { initialResources, Resource, ResourceCategory, ResourceFileType } from "@/lib/mockResources";
+import {
+  initialResources,
+  Resource,
+  ResourceCategory,
+  ResourceFileType,
+} from "@/lib/mockResources";
 
 // Stream Types definition
-export type StreamType = "cs" | "electrical" | "mechanical" | "math-sciences" | "humanities" | "placement" | "other";
+export type StreamType =
+  | "cs"
+  | "electrical"
+  | "mechanical"
+  | "math-sciences"
+  | "humanities"
+  | "placement"
+  | "other";
 
 // Map course code prefix to streams
 const getStreamFromCourseCode = (courseCode: string): StreamType => {
   if (!courseCode) return "other";
   const code = courseCode.toUpperCase();
   if (code.startsWith("CS")) return "cs";
-  if (code.startsWith("EE") || code.startsWith("EC") || code.startsWith("EN")) return "electrical";
+  if (code.startsWith("EE") || code.startsWith("EC") || code.startsWith("EN"))
+    return "electrical";
   if (code.startsWith("ME")) return "mechanical";
-  if (code.startsWith("MA") || code.startsWith("PH") || code.startsWith("CH")) return "math-sciences";
+  if (code.startsWith("MA") || code.startsWith("PH") || code.startsWith("CH"))
+    return "math-sciences";
   if (code.startsWith("HS")) return "humanities";
   if (code === "PLACEMENTS" || code.startsWith("PLACE")) return "placement";
   return "other";
@@ -52,48 +66,59 @@ const getStreamFromCourseCode = (courseCode: string): StreamType => {
 
 // Stream display details mapping
 const getStreamInfo = (stream: StreamType) => {
-  const mapping: Record<StreamType, { label: string; icon: any; color: string; description: string }> = {
+  const mapping: Record<
+    StreamType,
+    { label: string; icon: any; color: string; description: string }
+  > = {
     cs: {
       label: "Computer Science & Engineering",
       icon: Terminal,
       color: "text-indigo-500 fill-indigo-500/10 border-indigo-500/20",
-      description: "DSA, programming, networks, machine learning and systems core.",
+      description:
+        "DSA, programming, networks, machine learning and systems core.",
     },
     electrical: {
       label: "Electrical & Electronics Engineering",
       icon: HardDrive,
       color: "text-amber-500 fill-amber-500/10 border-amber-500/20",
-      description: "Circuit systems, signal processing, and electronics analysis.",
+      description:
+        "Circuit systems, signal processing, and electronics analysis.",
     },
     mechanical: {
       label: "Mechanical Engineering",
       icon: Gauge,
       color: "text-sky-500 fill-sky-500/10 border-sky-500/20",
-      description: "Thermodynamics, fluid mechanics, design, and instrumentation.",
+      description:
+        "Thermodynamics, fluid mechanics, design, and instrumentation.",
     },
     "math-sciences": {
       label: "Mathematics & Basic Sciences",
       icon: Library,
       color: "text-emerald-500 fill-emerald-500/10 border-emerald-500/20",
-      description: "Linear algebra, multivariable calculus, physics, and chemistry.",
+      description:
+        "Linear algebra, multivariable calculus, physics, and chemistry.",
     },
     humanities: {
       label: "Humanities & Social Sciences",
       icon: BookOpen,
       color: "text-purple-500 fill-purple-500/10 border-purple-500/20",
-      description: "Technical writing, communications, and economics curriculum.",
+      description:
+        "Technical writing, communications, and economics curriculum.",
     },
     placement: {
       label: "Placements & Careers",
       icon: Briefcase,
       color: "text-red-500 fill-red-500/10 border-red-500/20",
-      description: "Interview logs, coding sheets, resume templates, and prep logs.",
+      description:
+        "Interview logs, coding sheets, resume templates, and prep logs.",
     },
     other: {
       label: "General & Miscellaneous",
       icon: Library,
-      color: "text-muted-foreground fill-muted-foreground/10 border-muted-foreground/20",
-      description: "General orientation guides, software guidelines, and student discounts.",
+      color:
+        "text-muted-foreground fill-muted-foreground/10 border-muted-foreground/20",
+      description:
+        "General orientation guides, software guidelines, and student discounts.",
     },
   };
   return mapping[stream];
@@ -103,15 +128,30 @@ const getStreamInfo = (stream: StreamType) => {
 const getFileTypeStyle = (type: ResourceFileType) => {
   switch (type) {
     case "PDF":
-      return { bg: "bg-red-500/10 text-red-500 border-red-500/20", icon: FileText };
+      return {
+        bg: "bg-red-500/10 text-red-500 border-red-500/20",
+        icon: FileText,
+      };
     case "ZIP":
-      return { bg: "bg-amber-500/10 text-amber-500 border-amber-500/20", icon: FileArchive };
+      return {
+        bg: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+        icon: FileArchive,
+      };
     case "GitHub":
-      return { bg: "bg-indigo-500/10 text-indigo-500 border-indigo-500/20", icon: Github };
+      return {
+        bg: "bg-indigo-500/10 text-indigo-500 border-indigo-500/20",
+        icon: Github,
+      };
     case "Drive":
-      return { bg: "bg-green-500/10 text-green-500 border-green-500/20", icon: HardDrive };
+      return {
+        bg: "bg-green-500/10 text-green-500 border-green-500/20",
+        icon: HardDrive,
+      };
     default:
-      return { bg: "bg-sky-500/10 text-sky-500 border-sky-500/20", icon: LinkIcon };
+      return {
+        bg: "bg-sky-500/10 text-sky-500 border-sky-500/20",
+        icon: LinkIcon,
+      };
   }
 };
 
@@ -147,10 +187,14 @@ export function ResourcesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedStream, setSelectedStream] = useState<string>("all");
-  const [sortOrder, setSortOrder] = useState<"latest" | "upvotes" | "downloads">("latest");
+  const [sortOrder, setSortOrder] = useState<
+    "latest" | "upvotes" | "downloads"
+  >("latest");
 
   // Expanded folders state (stores stream keys like cs, electrical)
-  const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>(() => {
+  const [expandedFolders, setExpandedFolders] = useState<
+    Record<string, boolean>
+  >(() => {
     return {
       cs: true,
       electrical: true,
@@ -167,7 +211,8 @@ export function ResourcesPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newUrl, setNewUrl] = useState("");
-  const [newCategory, setNewCategory] = useState<ResourceCategory>("course-material");
+  const [newCategory, setNewCategory] =
+    useState<ResourceCategory>("course-material");
   const [newCourseCode, setNewCourseCode] = useState("");
   const [newCourseName, setNewCourseName] = useState("");
   const [newSemester, setNewSemester] = useState<number>(3);
@@ -204,14 +249,19 @@ export function ResourcesPage() {
       updatedUpvotes = [...upvotedIds, id];
     }
     setUpvotedIds(updatedUpvotes);
-    localStorage.setItem("ph_upvoted_resources", JSON.stringify(updatedUpvotes));
+    localStorage.setItem(
+      "ph_upvoted_resources",
+      JSON.stringify(updatedUpvotes),
+    );
 
     // Update resources list counts
     const updatedResources = resources.map((r) => {
       if (r._id === id) {
         return {
           ...r,
-          upvotesCount: alreadyUpvoted ? r.upvotesCount - 1 : r.upvotesCount + 1,
+          upvotesCount: alreadyUpvoted
+            ? r.upvotesCount - 1
+            : r.upvotesCount + 1,
         };
       }
       return r;
@@ -325,7 +375,10 @@ export function ResourcesPage() {
         // Category Filter
         if (selectedCategory === "bookmarked") {
           if (!bookmarkedIds.includes(r._id)) return false;
-        } else if (selectedCategory !== "all" && r.category !== selectedCategory) {
+        } else if (
+          selectedCategory !== "all" &&
+          r.category !== selectedCategory
+        ) {
           return false;
         }
 
@@ -356,9 +409,18 @@ export function ResourcesPage() {
           return b.downloadsCount - a.downloadsCount;
         }
         // Latest (default)
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       });
-  }, [resources, searchQuery, selectedCategory, selectedStream, sortOrder, bookmarkedIds]);
+  }, [
+    resources,
+    searchQuery,
+    selectedCategory,
+    selectedStream,
+    sortOrder,
+    bookmarkedIds,
+  ]);
 
   // Group Filtered Resources by Stream
   const groupedResources = useMemo(() => {
@@ -380,7 +442,15 @@ export function ResourcesPage() {
 
   // Display only streams that have matching resources
   const activeStreams = useMemo(() => {
-    const streams: StreamType[] = ["cs", "electrical", "mechanical", "math-sciences", "humanities", "placement", "other"];
+    const streams: StreamType[] = [
+      "cs",
+      "electrical",
+      "mechanical",
+      "math-sciences",
+      "humanities",
+      "placement",
+      "other",
+    ];
     return streams.filter((s) => {
       // If we are filtering by a specific stream in sidebar, only show that stream
       if (selectedStream !== "all" && s !== selectedStream) return false;
@@ -415,7 +485,8 @@ export function ResourcesPage() {
                 PeerHive <span className="text-primary">Resources</span>
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                Browse academic lecture slides, lab manuals, projects, and career documents categorized by streams.
+                Browse academic lecture slides, lab manuals, projects, and
+                career documents categorized by streams.
               </p>
             </div>
 
@@ -431,7 +502,7 @@ export function ResourcesPage() {
           </div>
 
           {/* Search bar inside Hero */}
-          <div className="mt-6 max-w-xl">
+          <div data-tour="resources-search" className="mt-6 max-w-xl">
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -452,16 +523,20 @@ export function ResourcesPage() {
             </div>
             {/* Quick tag suggestions */}
             <div className="mt-3 flex flex-wrap gap-1.5 items-center">
-              <span className="text-xs text-muted-foreground mr-1.5">Quick search:</span>
-              {["MA-201", "DSA", "MATLAB", "Signals", "Interview Prep"].map((term) => (
-                <button
-                  key={term}
-                  onClick={() => handleChipClick(term)}
-                  className="text-xs px-2 py-0.5 rounded-md bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground border border-border/50 transition"
-                >
-                  {term}
-                </button>
-              ))}
+              <span className="text-xs text-muted-foreground mr-1.5">
+                Quick search:
+              </span>
+              {["MA-201", "DSA", "MATLAB", "Signals", "Interview Prep"].map(
+                (term) => (
+                  <button
+                    key={term}
+                    onClick={() => handleChipClick(term)}
+                    className="text-xs px-2 py-0.5 rounded-md bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground border border-border/50 transition"
+                  >
+                    {term}
+                  </button>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -472,18 +547,30 @@ export function ResourcesPage() {
         {/* Left Sidebar Filters */}
         <aside className="lg:col-span-1 space-y-6">
           {/* Categories Sidebar */}
-          <div className="bg-card rounded-2xl border border-border p-4 space-y-2">
+          <div
+            data-tour="resources-categories"
+            className="bg-card rounded-2xl border border-border p-4 space-y-2"
+          >
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-2 mb-2">
               Categories
             </h3>
             <nav className="space-y-1">
               {[
                 { id: "all", label: "All Resources", icon: Library },
-                { id: "course-material", label: "Course Materials", icon: BookOpen },
+                {
+                  id: "course-material",
+                  label: "Course Materials",
+                  icon: BookOpen,
+                },
                 { id: "lab-manual", label: "Lab Manuals", icon: Terminal },
                 { id: "project", label: "Student Projects", icon: Github },
                 { id: "placement", label: "Placement Prep", icon: Briefcase },
-                { id: "bookmarked", label: "Bookmarked", icon: Bookmark, badge: bookmarkedIds.length },
+                {
+                  id: "bookmarked",
+                  label: "Bookmarked",
+                  icon: Bookmark,
+                  badge: bookmarkedIds.length,
+                },
               ].map((cat) => {
                 const active = selectedCategory === cat.id;
                 const Icon = cat.icon;
@@ -491,10 +578,11 @@ export function ResourcesPage() {
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`w-full flex items-center justify-between px-3 h-10 rounded-xl text-xs font-medium transition ${active
+                    className={`w-full flex items-center justify-between px-3 h-10 rounded-xl text-xs font-medium transition ${
+                      active
                         ? "bg-primary text-primary-foreground"
                         : "text-foreground/70 hover:text-foreground hover:bg-secondary"
-                      }`}
+                    }`}
                   >
                     <span className="flex items-center gap-2.5">
                       <Icon className="h-4 w-4" />
@@ -502,8 +590,11 @@ export function ResourcesPage() {
                     </span>
                     {cat.badge !== undefined && cat.badge > 0 && (
                       <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${active ? "bg-primary-foreground text-primary" : "bg-secondary text-muted-foreground"
-                          }`}
+                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                          active
+                            ? "bg-primary-foreground text-primary"
+                            : "bg-secondary text-muted-foreground"
+                        }`}
                       >
                         {cat.badge}
                       </span>
@@ -523,11 +614,31 @@ export function ResourcesPage() {
               {[
                 { id: "all", label: "All Streams", icon: Library },
                 { id: "cs", label: "Computer Science", icon: Terminal },
-                { id: "electrical", label: "Electrical Engineering", icon: HardDrive },
-                { id: "mechanical", label: "Mechanical Engineering", icon: Gauge },
-                { id: "math-sciences", label: "Math & Sciences", icon: Library },
-                { id: "humanities", label: "Humanities & Social", icon: BookOpen },
-                { id: "placement", label: "Placements & Career", icon: Briefcase },
+                {
+                  id: "electrical",
+                  label: "Electrical Engineering",
+                  icon: HardDrive,
+                },
+                {
+                  id: "mechanical",
+                  label: "Mechanical Engineering",
+                  icon: Gauge,
+                },
+                {
+                  id: "math-sciences",
+                  label: "Math & Sciences",
+                  icon: Library,
+                },
+                {
+                  id: "humanities",
+                  label: "Humanities & Social",
+                  icon: BookOpen,
+                },
+                {
+                  id: "placement",
+                  label: "Placements & Career",
+                  icon: Briefcase,
+                },
               ].map((stream) => {
                 const active = selectedStream === stream.id;
                 const Icon = stream.icon;
@@ -535,10 +646,11 @@ export function ResourcesPage() {
                   <button
                     key={stream.id}
                     onClick={() => setSelectedStream(stream.id)}
-                    className={`w-full flex items-center justify-between px-3 h-9 rounded-lg text-xs font-medium transition ${active
+                    className={`w-full flex items-center justify-between px-3 h-9 rounded-lg text-xs font-medium transition ${
+                      active
                         ? "bg-secondary text-primary font-medium border-l-2 border-primary"
                         : "text-foreground/70 hover:text-foreground hover:bg-secondary"
-                      }`}
+                    }`}
                   >
                     <span className="flex items-center gap-2">
                       <Icon className="h-2.5 w-2.5" />
@@ -588,9 +700,12 @@ export function ResourcesPage() {
               <div className="mx-auto w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4">
                 <Library className="h-6 w-6 text-muted-foreground" />
               </div>
-              <h3 className="font-display font-bold text-lg">No resources match your filters</h3>
+              <h3 className="font-display font-bold text-lg">
+                No resources match your filters
+              </h3>
               <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
-                Try resetting your search queries or selecting a different category/stream.
+                Try resetting your search queries or selecting a different
+                category/stream.
               </p>
               <Button
                 variant="outline"
@@ -607,7 +722,7 @@ export function ResourcesPage() {
             </div>
           ) : (
             /* Stream Folders Accordion List */
-            <div className="space-y-4">
+            <div data-tour="resources-list" className="space-y-4">
               {activeStreams.map((stream) => {
                 const subResources = groupedResources[stream] || [];
                 const expanded = expandedFolders[stream] ?? true;
@@ -625,7 +740,9 @@ export function ResourcesPage() {
                       className="w-full flex items-center justify-between p-4 bg-card/40 hover:bg-card transition duration-200 border-b border-border/20"
                     >
                       <div className="flex items-center gap-3 text-left">
-                        <div className={`p-2 rounded-xl border border-border bg-card ${streamInfo.color}`}>
+                        <div
+                          className={`p-2 rounded-xl border border-border bg-card ${streamInfo.color}`}
+                        >
                           <StreamIcon className="h-5 w-5" />
                         </div>
                         <div>
@@ -633,13 +750,17 @@ export function ResourcesPage() {
                             {streamInfo.label}
                           </h3>
                           <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
-                            {streamInfo.description} • {subResources.length} {subResources.length === 1 ? "resource" : "resources"}
+                            {streamInfo.description} • {subResources.length}{" "}
+                            {subResources.length === 1
+                              ? "resource"
+                              : "resources"}
                           </p>
                         </div>
                       </div>
                       <ChevronRight
-                        className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${expanded ? "rotate-90" : ""
-                          }`}
+                        className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${
+                          expanded ? "rotate-90" : ""
+                        }`}
                       />
                     </button>
 
@@ -655,9 +776,13 @@ export function ResourcesPage() {
                           <div className="p-4 bg-card/10">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {subResources.map((res) => {
-                                const isBookmarked = bookmarkedIds.includes(res._id);
+                                const isBookmarked = bookmarkedIds.includes(
+                                  res._id,
+                                );
                                 const isUpvoted = upvotedIds.includes(res._id);
-                                const fileStyle = getFileTypeStyle(res.fileType);
+                                const fileStyle = getFileTypeStyle(
+                                  res.fileType,
+                                );
                                 const TypeIcon = fileStyle.icon;
 
                                 return (
@@ -670,10 +795,16 @@ export function ResourcesPage() {
                                       {/* Card Top Row */}
                                       <div className="flex items-start justify-between gap-2 mb-3">
                                         <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                                          <Badge variant="outline" className="text-[10px] font-bold font-mono py-0 bg-secondary/30">
+                                          <Badge
+                                            variant="outline"
+                                            className="text-[10px] font-bold font-mono py-0 bg-secondary/30"
+                                          >
                                             {res.courseCode}
                                           </Badge>
-                                          <span className="text-[10px] text-muted-foreground truncate max-w-[120px]" title={res.courseName}>
+                                          <span
+                                            className="text-[10px] text-muted-foreground truncate max-w-[120px]"
+                                            title={res.courseName}
+                                          >
                                             {res.courseName}
                                           </span>
                                         </div>
@@ -696,7 +827,12 @@ export function ResourcesPage() {
                                       {/* Card Title & Description */}
                                       <h4
                                         className="font-display font-bold text-base group-hover:text-primary transition duration-200 line-clamp-1 cursor-pointer"
-                                        onClick={() => handleDownloadTrigger(res._id, res.url)}
+                                        onClick={() =>
+                                          handleDownloadTrigger(
+                                            res._id,
+                                            res.url,
+                                          )
+                                        }
                                         title={res.title}
                                       >
                                         {res.title}
@@ -721,7 +857,10 @@ export function ResourcesPage() {
 
                                     {/* Card Footer Actions */}
                                     <div className="mt-5 pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
-                                      <span className="truncate max-w-[120px]" title={`Uploaded by ${res.uploadedBy.name}`}>
+                                      <span
+                                        className="truncate max-w-[120px]"
+                                        title={`Uploaded by ${res.uploadedBy.name}`}
+                                      >
                                         by {res.uploadedBy.name.split(" ")[0]}
                                       </span>
 
@@ -764,11 +903,17 @@ export function ResourcesPage() {
 
                                         {/* Download/Open */}
                                         <button
-                                          onClick={() => handleDownloadTrigger(res._id, res.url)}
+                                          onClick={() =>
+                                            handleDownloadTrigger(
+                                              res._id,
+                                              res.url,
+                                            )
+                                          }
                                           className="p-1.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition font-medium flex items-center gap-0.5 ml-0.5 border-0"
                                           title="Open/Download resource"
                                         >
-                                          {res.fileType === "PDF" || res.fileType === "ZIP" ? (
+                                          {res.fileType === "PDF" ||
+                                          res.fileType === "ZIP" ? (
                                             <Download className="h-3.5 w-3.5" />
                                           ) : (
                                             <ExternalLink className="h-3.5 w-3.5" />
@@ -878,7 +1023,9 @@ export function ResourcesPage() {
               </span>
               <select
                 value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value as ResourceCategory)}
+                onChange={(e) =>
+                  setNewCategory(e.target.value as ResourceCategory)
+                }
                 className="w-full h-11 px-3 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 border-0"
               >
                 <option value="course-material">Course Material</option>
@@ -914,7 +1061,9 @@ export function ResourcesPage() {
               </span>
               <select
                 value={newFileType}
-                onChange={(e) => setNewFileType(e.target.value as ResourceFileType)}
+                onChange={(e) =>
+                  setNewFileType(e.target.value as ResourceFileType)
+                }
                 className="w-full h-11 px-3 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 border-0"
               >
                 <option value="PDF">PDF Document</option>
@@ -953,10 +1102,17 @@ export function ResourcesPage() {
           </label>
 
           <div className="flex justify-end gap-2 pt-4 border-t border-border mt-6">
-            <Button type="button" variant="ghost" onClick={() => setIsUploadOpen(false)}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsUploadOpen(false)}
+            >
               Cancel
             </Button>
-            <Button type="submit" className="bg-primary text-primary-foreground border-0 hover:opacity-90">
+            <Button
+              type="submit"
+              className="bg-primary text-primary-foreground border-0 hover:opacity-90"
+            >
               Submit Resource
             </Button>
           </div>

@@ -55,6 +55,7 @@ export function Navbar() {
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
+                data-tour="nav-search"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 placeholder="Search threads, forums, people…"
@@ -96,6 +97,7 @@ export function Navbar() {
 
           <div className="ml-auto flex items-center gap-1.5">
             <Button
+              data-tour="nav-post"
               size="sm"
               onClick={() => {
                 if (!user) return setAuthOpen(true);
@@ -106,6 +108,7 @@ export function Navbar() {
               <Plus className="h-4 w-4" /> Post
             </Button>
             <button
+              data-tour="nav-theme"
               onClick={toggleDark}
               className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-secondary"
               aria-label="Toggle theme"
@@ -117,6 +120,7 @@ export function Navbar() {
               )}
             </button>
             <button
+              data-tour="nav-notifications"
               onClick={() => (user ? setNotifOpen(true) : setAuthOpen(true))}
               className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-secondary"
               aria-label="Notifications"
@@ -130,6 +134,7 @@ export function Navbar() {
             </button>
             {user ? (
               <button
+                data-tour="nav-profile"
                 onClick={() => setAuthOpen(true)}
                 className="ml-1 hidden md:grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-bold ring-2 ring-background hover:ring-primary/40 transition overflow-hidden"
                 aria-label="Profile"
@@ -144,6 +149,7 @@ export function Navbar() {
               </button>
             ) : (
               <Button
+                data-tour="nav-profile"
                 size="sm"
                 variant="outline"
                 onClick={() => setAuthOpen(true)}

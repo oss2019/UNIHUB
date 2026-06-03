@@ -16,7 +16,10 @@ export function BottomNav() {
   const { setCreateOpen, setAuthOpen } = useUI();
   const { data: user } = useQuery(meQuery());
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 glass border-t border-border">
+    <nav
+      data-tour="bottom-nav"
+      className="md:hidden fixed bottom-0 inset-x-0 z-30 glass border-t border-border"
+    >
       <div className="grid grid-cols-5 h-16 px-2">
         {items.slice(0, 2).map(({ to, label, icon: Icon }) => {
           const active = loc.pathname === to;
@@ -24,6 +27,7 @@ export function BottomNav() {
             <Link
               key={to}
               to={to}
+              data-tour={`bottom-${label.toLowerCase()}`}
               className={`flex flex-col items-center justify-center gap-0.5 text-[10px] ${active ? "text-primary" : "text-muted-foreground"}`}
             >
               <Icon className="h-5 w-5" /> {label}
@@ -32,6 +36,7 @@ export function BottomNav() {
         })}
         <button
           onClick={() => (user ? setCreateOpen(true) : setAuthOpen(true))}
+          data-tour="bottom-post"
           className="flex flex-col items-center justify-center"
           aria-label="Create"
         >
@@ -45,6 +50,7 @@ export function BottomNav() {
             <Link
               key={to}
               to={to}
+              data-tour={`bottom-${label === "Events" ? "calendar" : label.toLowerCase()}`}
               className={`flex flex-col items-center justify-center gap-0.5 text-[10px] ${active ? "text-primary" : "text-muted-foreground"}`}
             >
               <Icon className="h-5 w-5" /> {label}
@@ -53,6 +59,7 @@ export function BottomNav() {
         })}
         <button
           onClick={() => setAuthOpen(true)}
+          data-tour="bottom-profile"
           className="flex flex-col items-center justify-center gap-0.5 text-[10px] text-muted-foreground"
           aria-label={user ? "Profile" : "Sign in"}
         >

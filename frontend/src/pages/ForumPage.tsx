@@ -158,7 +158,10 @@ export function ForumPage() {
             No subforums yet.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div
+            data-tour="forum-subforums"
+            className="grid grid-cols-1 md:grid-cols-2 gap-3"
+          >
             {subForums.map((s, i) => (
               <motion.div
                 key={s._id}

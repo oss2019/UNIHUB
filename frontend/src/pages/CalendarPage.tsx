@@ -7,7 +7,7 @@ export function CalendarPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div data-tour="calendar-view" className="space-y-6">
       <header>
         <h1 className="font-display text-3xl font-bold">Calendar</h1>
         <p className="text-muted-foreground mt-1">

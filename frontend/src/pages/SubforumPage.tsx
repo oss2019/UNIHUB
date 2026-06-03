@@ -206,6 +206,7 @@ export function SubforumPage() {
               {muted ? "Muted" : "Mute"}
             </Button>
             <Button
+              data-tour="subforum-new-post"
               size="sm"
               onClick={requireAuth(() => setCreateOpen(true, subId))}
             >

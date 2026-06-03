@@ -58,7 +58,7 @@ export function HomePage() {
       </section>
 
       {/* Forums grid */}
-      <section>
+      <section data-tour="home-forums">
         <div className="flex items-end justify-between mb-4">
           <div>
             <h2 className="font-display text-2xl font-bold">Forums</h2>
