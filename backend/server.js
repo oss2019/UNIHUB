@@ -3,7 +3,7 @@ import connectDB from './config/db.js';
 import app from './app.js';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: './.env' });
+dotenv.config({path: './.env'});
 const PORT = process.env.PORT || 6441;
 
 app.listen(PORT, async () => {
