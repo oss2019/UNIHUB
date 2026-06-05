@@ -11,6 +11,7 @@ import subForumRoutes from "./routes/subForumRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js"; // 🔥 IMPORTANT
 import notificationRoutes from "./routes/notificationRoutes.js";
 import workRequestRoutes from "./routes/workRequestRoutes.js";
+import resourceRoutes from "./routes/resourceRoutes.js";
 import './config/scheduler.js'; // Start cron jobs on app boot
 
 import globalErrorHandler from "./controllers/errorController.js";
@@ -59,6 +60,7 @@ app.use("/api", forumRoutes);
 app.use("/api", subForumRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/resources", resourceRoutes);
 app.use("/api", workRequestRoutes);
 
 // 404 handler
