@@ -1,0 +1,22 @@
+version: "3.9"
+
+# ─── docker-compose.prod.yml ──────────────────────────────────────────────────
+# Production overrides – merge with base file:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+
+  backend:
+    # Remove direct port exposure in production – only nginx talks to it
+    ports: !reset []
+
+  frontend:
+    ports: !reset []
+
+  admin:
+    ports: !reset []
+
+  nginx:
+    ports:
+      - "80:80"
+      - "443:443"

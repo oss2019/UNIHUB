@@ -3,6 +3,7 @@ import { protect } from "../middlewares/authMiddleware.js";
 import {
     getUserProfile,
     updateUserProfile,
+    onboardUser,
 } from "../controllers/userController.js";
 import { getUserThreads } from "../controllers/threadController.js";
 
@@ -16,5 +17,8 @@ router.patch("/:id", protect, updateUserProfile);
 
 // GET /api/users/:id/threads — get threads by user ID
 router.get("/:id/threads", getUserThreads);
+
+// POST /api/users/onboard — complete onboarding (auth required)
+router.post("/onboard", protect, onboardUser);
 
 export default router;

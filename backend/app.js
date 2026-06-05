@@ -3,7 +3,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "./config/passport.js";
-
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import threadRoutes from "./routes/threadRoutes.js";
@@ -27,7 +26,10 @@ app.get("/test", (req, res) => {
 // Middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: [
+      process.env.CLIENT_URL || "http://localhost:6442",
+      "http://localhost:6443",
+    ],
     credentials: true,
   })
 );
@@ -48,6 +50,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use("/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/threads", threadRoutes);

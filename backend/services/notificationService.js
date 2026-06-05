@@ -177,6 +177,19 @@ export const notifyWorkOpportunity = async (workRequest, members) => {
 
   await Notification.insertMany(notifications, { ordered: false });
 
+  // Send instant work-opportunity emails to each targeted member
+  // The controller passes only { _id }, so fetch name + email for the email
+  const memberIds = members.map((m) => m._id);
+  const fullMembers = await User.find({ _id: { $in: memberIds } })
+    .select('name email')
+    .lean();
+
+  for (const member of fullMembers) {
+    if (member.email) {
+      await emailService.sendWorkOpportunityEmail(member, workRequest);
+    }
+  }
+
   // Check threshold for each notified member
   for (const member of members) {
     await checkThresholdEmail(member._id);

@@ -27,8 +27,9 @@ export const createThread = async (threadData) => {
     return await Thread.create(threadData);
 };
 
-export const getThreadsBySubForumTags = async (tags, skip, limit) => {
-    const filter = { tags: { $in: tags } };
+export const getThreadsBySubForum = async (subForumId, _tags, skip, limit) => {
+    // Subforum feed must be strictly scoped to one subforum.
+    const filter = { subForum: subForumId };
     const threads = await Thread.find(filter)
         .sort({ isPinned: -1, createdAt: -1 })
         .skip(skip)

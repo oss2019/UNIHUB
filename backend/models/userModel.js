@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema(
     github: { type: String },
     isVerified: { type: Boolean, default: false },
     lastActive: { type: Date, default: Date.now },
+    onboardingCompleted: { type: Boolean, default: false },
     joinedForums: [
       {
         type: mongoose.Schema.Types.ObjectId,
