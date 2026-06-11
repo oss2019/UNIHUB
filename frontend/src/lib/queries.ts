@@ -8,6 +8,7 @@ import {
   commentApi,
   notificationApi,
   workRequestApi,
+  resourceApi,
   ApiError,
 } from "./api";
 
@@ -26,6 +27,8 @@ export const qk = {
   unreadCount: ["notifications", "unread"] as const,
   workRequests: (subforumId: string) => ["workRequests", subforumId] as const,
   searchThreads: (q: string) => ["search", q] as const,
+  resources: (filters: Record<string, string | number | undefined>) =>
+    ["resources", filters] as const,
 };
 
 export const meQuery = () =>
@@ -118,4 +121,13 @@ export const workRequestsQuery = (subforumId: string) =>
     queryKey: qk.workRequests(subforumId),
     queryFn: () => workRequestApi.bySubforum(subforumId),
     enabled: !!subforumId,
+  });
+
+export const resourcesQuery = (
+  filters: { category?: string; semester?: number; search?: string } = {},
+) =>
+  queryOptions({
+    queryKey: qk.resources(filters),
+    queryFn: () => resourceApi.list(filters),
+    staleTime: 30_000,
   });

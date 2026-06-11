@@ -13,6 +13,8 @@ import type {
   Paginated,
   RequestStatus,
   ForumType,
+  Resource,
+  CreateResourceInput,
 } from "./types";
 
 export const API_BASE =
@@ -103,7 +105,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
     }
   }
 
-  let data: any = null;
+  let data: unknown = null;
   const text = await res.text();
   if (text) {
     try {
@@ -114,9 +116,10 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   }
 
   if (!res.ok) {
+    const hasMessage = (obj: unknown): obj is { message: unknown } =>
+      typeof obj === "object" && obj !== null && "message" in obj;
     const msg =
-      (data && typeof data === "object" && "message" in data && data.message) ||
-      `Request failed (${res.status})`;
+      (hasMessage(data) && data.message) || `Request failed (${res.status})`;
     throw new ApiError(res.status, String(msg), data);
   }
 
@@ -124,30 +127,41 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
 }
 
 // helper to unwrap { data: { key: T } }
-const data = <T>(p: Promise<{ data?: T } | any>): Promise<T> =>
-  p.then((r) => (r && r.data ? r.data : r));
+const data = <T>(p: Promise<unknown>): Promise<T> =>
+  p.then((r) => {
+    if (r && typeof r === "object" && "data" in r) {
+      return (r as { data: T }).data;
+    }
+    return r as T;
+  });
 
-const normalizeAuthUser = (payload: any): User => {
-  const rawUser = payload?.user ?? payload ?? {};
-  const avatar =
-    rawUser?.avatar ||
-    payload?.avatar ||
-    rawUser?.picture ||
-    rawUser?.photo ||
-    rawUser?.photoUrl ||
-    "";
+const normalizeAuthUser = (payload: unknown): User => {
+  const rawPayload = (
+    payload && typeof payload === "object" ? payload : {}
+  ) as Record<string, unknown>;
+  const rawUser = (
+    rawPayload.user && typeof rawPayload.user === "object"
+      ? rawPayload.user
+      : rawPayload
+  ) as Record<string, unknown>;
+  const avatar = (rawUser.avatar ||
+    rawPayload.avatar ||
+    rawUser.picture ||
+    rawUser.photo ||
+    rawUser.photoUrl ||
+    "") as string;
 
   return {
     ...rawUser,
     avatar,
-  } as User;
+  } as unknown as User;
 };
 
 // ───────── Auth ─────────
 export const authApi = {
   googleUrl: () => `${API_BASE}/auth/google`,
   me: () =>
-    data<any>(request("/auth/me", { noRefresh: false })).then((d) =>
+    data<unknown>(request("/auth/me", { noRefresh: false })).then((d) =>
       normalizeAuthUser(d),
     ),
   refresh: () =>
@@ -407,6 +421,25 @@ export const workRequestApi = {
     data<{ workRequests: WorkRequest[] }>(
       request("/api/work-requests/mine"),
     ).then((d) => d.workRequests),
+};
+
+// ───────── Resources ─────────
+export const resourceApi = {
+  list: (filters?: { category?: string; semester?: number; search?: string }) =>
+    data<{ resources: Resource[] }>(
+      request("/api/resources", {
+        query: filters as Record<string, string | number | undefined>,
+      }),
+    ).then((d) => d.resources),
+  create: (body: CreateResourceInput) =>
+    data<{ resource: Resource }>(
+      request("/api/resources", { method: "POST", body }),
+    ).then((d) => d.resource),
+  remove: (id: string) => request("/api/resources/" + id, { method: "DELETE" }),
+  incrementDownload: (id: string) =>
+    data<{ downloadsCount: number }>(
+      request(`/api/resources/${id}/download`, { method: "POST" }),
+    ),
 };
 
 // File → base64 data URL helper for thread attachments

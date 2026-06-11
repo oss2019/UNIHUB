@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect, useMemo, ComponentType } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -26,17 +26,19 @@ import {
   UserCheck,
   X,
   Gauge,
+  Trash2,
 } from "lucide-react";
-import { meQuery } from "@/lib/queries";
+import { meQuery, resourcesQuery } from "@/lib/queries";
+import { resourceApi } from "@/lib/api";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/Modal";
 import { Badge } from "@/components/ui/badge";
 import {
-  initialResources,
   Resource,
   ResourceCategory,
   ResourceFileType,
+  CreateResourceInput,
 } from "@/lib/mockResources";
 
 // Stream Types definition
@@ -68,7 +70,12 @@ const getStreamFromCourseCode = (courseCode: string): StreamType => {
 const getStreamInfo = (stream: StreamType) => {
   const mapping: Record<
     StreamType,
-    { label: string; icon: any; color: string; description: string }
+    {
+      label: string;
+      icon: ComponentType<{ className?: string }>;
+      color: string;
+      description: string;
+    }
   > = {
     cs: {
       label: "Computer Science & Engineering",
@@ -160,23 +167,14 @@ export function ResourcesPage() {
     document.title = "Resources — PeerHive";
   }, []);
 
+  const queryClient = useQueryClient();
+
   // Fetch current user
   const { data: user } = useQuery(meQuery());
 
-  // Session state initialized with mock data
-  const [resources, setResources] = useState<Resource[]>(() => {
-    const saved = localStorage.getItem("ph_mock_resources");
-    return saved ? JSON.parse(saved) : initialResources;
-  });
-
-  // Bookmark / Upvote states synchronized in LocalStorage
+  // Bookmark states synchronized in LocalStorage (bookmarking is omitted from card actions, but we keep it for category filtering if active)
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>(() => {
     const saved = localStorage.getItem("ph_bookmarked_resources");
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [upvotedIds, setUpvotedIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem("ph_upvoted_resources");
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -187,9 +185,77 @@ export function ResourcesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedStream, setSelectedStream] = useState<string>("all");
-  const [sortOrder, setSortOrder] = useState<
-    "latest" | "upvotes" | "downloads"
-  >("latest");
+
+  // Debounce search query to prevent excessive API calls
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  // Fetch Resources from backend via React Query
+  const { data: resources = [], isLoading } = useQuery(
+    resourcesQuery({
+      category:
+        selectedCategory !== "all" && selectedCategory !== "bookmarked"
+          ? selectedCategory
+          : undefined,
+      search:
+        debouncedSearch.trim() !== "" ? debouncedSearch.trim() : undefined,
+    }),
+  );
+
+  // Add Resource Mutation
+  const createMutation = useMutation({
+    mutationFn: (newResource: CreateResourceInput) =>
+      resourceApi.create(newResource),
+    onSuccess: (data) => {
+      toast.success("Resource uploaded successfully!");
+      queryClient.invalidateQueries({ queryKey: ["resources"] });
+      setIsUploadOpen(false);
+
+      // Expand the folder for the stream
+      const targetStream = getStreamFromCourseCode(data.courseCode);
+      setExpandedFolders((prev) => ({ ...prev, [targetStream]: true }));
+
+      // Reset fields
+      setNewTitle("");
+      setNewDescription("");
+      setNewUrl("");
+      setNewCategory("course-material");
+      setNewCourseCode("");
+      setNewCourseName("");
+      setNewSemester(3);
+      setNewFileType("PDF");
+      setNewFileSize("");
+      setNewTagsString("");
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to upload resource");
+    },
+  });
+
+  // Download Trigger Mutation
+  const downloadMutation = useMutation({
+    mutationFn: (id: string) => resourceApi.incrementDownload(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resources"] });
+    },
+  });
+
+  // Delete Resource Mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => resourceApi.remove(id),
+    onSuccess: () => {
+      toast.success("Resource deleted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["resources"] });
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to delete resource");
+    },
+  });
 
   // Expanded folders state (stores stream keys like cs, electrical)
   const [expandedFolders, setExpandedFolders] = useState<
@@ -220,12 +286,6 @@ export function ResourcesPage() {
   const [newFileSize, setNewFileSize] = useState("");
   const [newTagsString, setNewTagsString] = useState("");
 
-  // Persist local changes to localStorage so user changes survive reloads
-  const saveResourcesToStorage = (updatedList: Resource[]) => {
-    setResources(updatedList);
-    localStorage.setItem("ph_mock_resources", JSON.stringify(updatedList));
-  };
-
   const handleBookmarkToggle = (id: string) => {
     let updated;
     if (bookmarkedIds.includes(id)) {
@@ -239,45 +299,8 @@ export function ResourcesPage() {
     localStorage.setItem("ph_bookmarked_resources", JSON.stringify(updated));
   };
 
-  const handleUpvoteToggle = (id: string) => {
-    let updatedUpvotes;
-    const alreadyUpvoted = upvotedIds.includes(id);
-
-    if (alreadyUpvoted) {
-      updatedUpvotes = upvotedIds.filter((x) => x !== id);
-    } else {
-      updatedUpvotes = [...upvotedIds, id];
-    }
-    setUpvotedIds(updatedUpvotes);
-    localStorage.setItem(
-      "ph_upvoted_resources",
-      JSON.stringify(updatedUpvotes),
-    );
-
-    // Update resources list counts
-    const updatedResources = resources.map((r) => {
-      if (r._id === id) {
-        return {
-          ...r,
-          upvotesCount: alreadyUpvoted
-            ? r.upvotesCount - 1
-            : r.upvotesCount + 1,
-        };
-      }
-      return r;
-    });
-    saveResourcesToStorage(updatedResources);
-  };
-
   const handleDownloadTrigger = (id: string, url: string) => {
-    // Increment mock download/visit counter
-    const updatedResources = resources.map((r) => {
-      if (r._id === id) {
-        return { ...r, downloadsCount: r.downloadsCount + 1 };
-      }
-      return r;
-    });
-    saveResourcesToStorage(updatedResources);
+    downloadMutation.mutate(id);
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
@@ -324,8 +347,7 @@ export function ResourcesPage() {
       .map((t) => t.trim().toLowerCase())
       .filter((t) => t.length > 0);
 
-    const newResource: Resource = {
-      _id: `res-custom-${Date.now()}`,
+    const newResourcePayload: CreateResourceInput = {
       title: newTitle.trim(),
       description: newDescription.trim() || "No description provided.",
       category: newCategory,
@@ -336,91 +358,28 @@ export function ResourcesPage() {
       semester: Number(newSemester),
       fileType: newFileType,
       fileSize: newFileSize.trim() || "Web Link",
-      uploadedBy: {
-        name: user?.name || "Simulated Admin",
-        role: "admin",
-      },
-      downloadsCount: 0,
-      upvotesCount: 0,
-      createdAt: new Date().toISOString(),
     };
 
-    const updatedList = [newResource, ...resources];
-    saveResourcesToStorage(updatedList);
-
-    // Expand the folder for the stream
-    const targetStream = getStreamFromCourseCode(newResource.courseCode);
-    setExpandedFolders((prev) => ({ ...prev, [targetStream]: true }));
-
-    // Reset fields
-    setNewTitle("");
-    setNewDescription("");
-    setNewUrl("");
-    setNewCategory("course-material");
-    setNewCourseCode("");
-    setNewCourseName("");
-    setNewSemester(3);
-    setNewFileType("PDF");
-    setNewFileSize("");
-    setNewTagsString("");
-
-    setIsUploadOpen(false);
-    toast.success("Resource uploaded successfully!");
+    createMutation.mutate(newResourcePayload);
   };
 
-  // Filter & Sort Logic
+  // Filter & Sort Logic (mainly filtering by client-only options like bookmarks & streams)
   const filteredResources = useMemo(() => {
-    return resources
-      .filter((r) => {
-        // Category Filter
-        if (selectedCategory === "bookmarked") {
-          if (!bookmarkedIds.includes(r._id)) return false;
-        } else if (
-          selectedCategory !== "all" &&
-          r.category !== selectedCategory
-        ) {
-          return false;
-        }
+    return resources.filter((r) => {
+      // Category Filter for bookmarks (others handled by API)
+      if (selectedCategory === "bookmarked") {
+        if (!bookmarkedIds.includes(r._id)) return false;
+      }
 
-        // Stream Filter (Sidebar Selector)
-        if (selectedStream !== "all") {
-          const stream = getStreamFromCourseCode(r.courseCode);
-          if (stream !== selectedStream) return false;
-        }
+      // Stream Filter (Sidebar Selector)
+      if (selectedStream !== "all") {
+        const stream = getStreamFromCourseCode(r.courseCode);
+        if (stream !== selectedStream) return false;
+      }
 
-        // Search Query Filter
-        if (searchQuery.trim() !== "") {
-          const query = searchQuery.toLowerCase();
-          const matchTitle = r.title.toLowerCase().includes(query);
-          const matchDesc = r.description.toLowerCase().includes(query);
-          const matchCode = r.courseCode.toLowerCase().includes(query);
-          const matchName = r.courseName.toLowerCase().includes(query);
-          const matchTags = r.tags.some((t) => t.toLowerCase().includes(query));
-          return matchTitle || matchDesc || matchCode || matchName || matchTags;
-        }
-
-        return true;
-      })
-      .sort((a, b) => {
-        if (sortOrder === "upvotes") {
-          return b.upvotesCount - a.upvotesCount;
-        }
-        if (sortOrder === "downloads") {
-          return b.downloadsCount - a.downloadsCount;
-        }
-        // Latest (default)
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      });
-  }, [
-    resources,
-    searchQuery,
-    selectedCategory,
-    selectedStream,
-    sortOrder,
-    bookmarkedIds,
-  ]);
+      return true;
+    });
+  }, [resources, selectedCategory, selectedStream, bookmarkedIds]);
 
   // Group Filtered Resources by Stream
   const groupedResources = useMemo(() => {
@@ -694,8 +653,15 @@ export function ResourcesPage() {
             </div>
           </div> */}
 
-          {/* Empty State */}
-          {filteredResources.length === 0 ? (
+          {/* Empty State / Loading State */}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center p-16 space-y-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              <p className="text-sm text-muted-foreground">
+                Loading resources...
+              </p>
+            </div>
+          ) : filteredResources.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-border bg-card/40 p-16 text-center">
               <div className="mx-auto w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4">
                 <Library className="h-6 w-6 text-muted-foreground" />
@@ -779,7 +745,6 @@ export function ResourcesPage() {
                                 const isBookmarked = bookmarkedIds.includes(
                                   res._id,
                                 );
-                                const isUpvoted = upvotedIds.includes(res._id);
                                 const fileStyle = getFileTypeStyle(
                                   res.fileType,
                                 );
@@ -859,47 +824,42 @@ export function ResourcesPage() {
                                     <div className="mt-5 pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
                                       <span
                                         className="truncate max-w-[120px]"
-                                        title={`Uploaded by ${res.uploadedBy.name}`}
+                                        title={`Uploaded by ${res.uploadedBy?.name || "Admin"}`}
                                       >
-                                        by {res.uploadedBy.name.split(" ")[0]}
+                                        by{" "}
+                                        {
+                                          (
+                                            res.uploadedBy?.name || "Admin"
+                                          ).split(" ")[0]
+                                        }
                                       </span>
 
                                       <div className="flex items-center gap-1">
-                                        {/* Upvote */}
-                                        {/* <button
-                                          onClick={() => handleUpvoteToggle(res._id)}
-                                          className={`p-1.5 rounded-lg border transition ${
-                                            isUpvoted
-                                              ? "bg-primary/10 text-primary border-primary/30"
-                                              : "border-border hover:bg-secondary hover:text-foreground"
-                                          }`}
-                                          title={isUpvoted ? "Remove upvote" : "Upvote resource"}
-                                        >
-                                          <ThumbsUp className="h-3.5 w-3.5" />
-                                          <span className="pl-1 text-[10px] font-bold">{res.upvotesCount}</span>
-                                        </button> */}
+                                        {/* Upvote (disabled/commented out) */}
 
-                                        {/* Bookmark */}
-                                        {/* <button
-                                          onClick={() => handleBookmarkToggle(res._id)}
-                                          className={`p-1.5 rounded-lg border transition ${
-                                            isBookmarked
-                                              ? "bg-secondary text-primary border-primary/20"
-                                              : "border-border hover:bg-secondary hover:text-foreground"
-                                          }`}
-                                          title={isBookmarked ? "Remove from bookmarks" : "Bookmark resource"}
-                                        >
-                                          <Bookmark className={`h-3.5 w-3.5 ${isBookmarked ? "fill-primary text-primary" : ""}`} />
-                                        </button> */}
+                                        {/* Bookmark (disabled/commented out) */}
 
-                                        {/* Copy Link */}
-                                        {/* <button
-                                          onClick={() => handleCopyLink(res.url)}
-                                          className="p-1.5 rounded-lg border border-border hover:bg-secondary hover:text-foreground transition"
-                                          title="Copy link to share"
-                                        >
-                                          <Copy className="h-3.5 w-3.5" />
-                                        </button> */}
+                                        {/* Copy Link (disabled/commented out) */}
+
+                                        {/* Delete (Admin-only) */}
+                                        {isAdmin && (
+                                          <button
+                                            onClick={() => {
+                                              if (
+                                                window.confirm(
+                                                  "Are you sure you want to permanently delete this resource?",
+                                                )
+                                              ) {
+                                                deleteMutation.mutate(res._id);
+                                              }
+                                            }}
+                                            disabled={deleteMutation.isPending}
+                                            className="p-1.5 rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 transition"
+                                            title="Delete Resource"
+                                          >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                          </button>
+                                        )}
 
                                         {/* Download/Open */}
                                         <button

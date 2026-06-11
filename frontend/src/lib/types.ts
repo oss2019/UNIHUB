@@ -154,3 +154,49 @@ export type Paginated<T> = {
     hasMore: boolean;
   };
 };
+
+// ───────── Resources ─────────
+
+export type ResourceCategory =
+  | "course-material"
+  | "lab-manual"
+  | "project"
+  | "placement"
+  | "other";
+
+export type ResourceFileType = "PDF" | "ZIP" | "Link" | "GitHub" | "Drive";
+
+export type Resource = {
+  _id: string;
+  title: string;
+  description: string;
+  category: ResourceCategory;
+  tags: string[];
+  url: string;
+  courseCode: string;
+  courseName: string;
+  semester: number;
+  fileType: ResourceFileType;
+  fileSize?: string;
+  uploadedBy: {
+    _id?: string;
+    name: string;
+    avatar?: string;
+    role?: string;
+  };
+  downloadsCount: number;
+  createdAt: string;
+};
+
+export type CreateResourceInput = {
+  title: string;
+  description?: string;
+  category: ResourceCategory;
+  tags: string[];
+  url: string;
+  courseCode: string;
+  courseName: string;
+  semester: number;
+  fileType: ResourceFileType;
+  fileSize?: string;
+};
