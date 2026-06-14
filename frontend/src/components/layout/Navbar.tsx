@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Plus, Search, Moon, Sun, Hexagon, Menu } from "lucide-react";
+import { Bell, Plus, Search, Moon, Sun, Menu } from "lucide-react";
 import { useState } from "react";
 import { useUI } from "@/lib/uiStore";
 import { meQuery, qk, unreadCountQuery } from "@/lib/queries";
@@ -40,12 +40,11 @@ export function Navbar() {
           </button>
 
           <Link to="/" className="flex items-center gap-2 font-display">
-            <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-primary">
-              <Hexagon
-                className="h-5 w-5 text-primary-foreground"
-                strokeWidth={2.5}
-              />
-            </div>
+            <img
+              src="/peerhive/Peerhive_Logo-removebg-preview.png"
+              alt="PeerHive Logo"
+              className="h-9 w-9 object-contain"
+            />
             <span className="hidden sm:block text-lg font-bold tracking-tight">
               peer<span className="text-primary">hive</span>
             </span>
