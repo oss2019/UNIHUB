@@ -1,5 +1,5 @@
-import  Forum from "../models/forumModel.js";
-import  SubForum  from "../models/subforumModel.js";
+import Forum from "../models/forumModel.js";
+import SubForum from "../models/subforumModel.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { AppError } from "../utils/appError.js";
 import { sendResponse } from "../utils/appResponse.js";
@@ -62,7 +62,9 @@ export const updateForum = catchAsync(async (req, res, next) => {
   // Forum.type is immutable after creation — changing it would break
   // the semantics of all sub-forums, threads, and work requests inside.
   if (type !== undefined) {
-    return next(new AppError(400, "Forum type cannot be changed after creation."));
+    return next(
+      new AppError(400, "Forum type cannot be changed after creation."),
+    );
   }
 
   const forum = await Forum.findById(req.params.id);
@@ -108,4 +110,4 @@ export const deleteForum = catchAsync(async (req, res, next) => {
     undefined,
     `Forum "${forum.name}" has been deactivated.`,
   );
-});
+});
