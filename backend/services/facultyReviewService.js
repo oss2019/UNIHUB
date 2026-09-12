@@ -71,10 +71,13 @@ export const fetchFacultyReviewById = async (id) => {
 export const insertFacultyReview = async (reviewData) => {
     const { photo, ...rest } = reviewData;
 
-    return await FacultyReview.create({
+    const created = await FacultyReview.create({
         ...rest,
         photo: await resolvePhoto(photo)
     });
+
+    // Populate on the way out so a created review matches the shape of a fetched one
+    return await created.populate({ path: 'postedBy', select: POSTED_BY_FIELDS });
 };
 
 /**

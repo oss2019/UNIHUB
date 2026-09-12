@@ -52,12 +52,14 @@ export const createReport = catchAsync(async (req, res, next) => {
  * @route GET /api/reports/my
  */
 export const getMyReports = catchAsync(async (req, res, next) => {
-    const { reports, total, page, limit } = await reportService.fetchAllReports(
+    const { reports, totalCount, hasMore } = await reportService.fetchAllReports(
         req.query,
         req.user._id
     );
 
-    return sendResponse(res, 200, 'success', 'reports', { reports, total, page, limit }, reports.length);
+    return sendResponse(
+        res, 200, 'success', 'pagination', { reports, totalCount, hasMore }, reports.length
+    );
 });
 
 /**
@@ -93,9 +95,11 @@ export const getReport = catchAsync(async (req, res, next) => {
  * @route GET /api/reports
  */
 export const getAllReports = catchAsync(async (req, res, next) => {
-    const { reports, total, page, limit } = await reportService.fetchAllReports(req.query);
+    const { reports, totalCount, hasMore } = await reportService.fetchAllReports(req.query);
 
-    return sendResponse(res, 200, 'success', 'reports', { reports, total, page, limit }, reports.length);
+    return sendResponse(
+        res, 200, 'success', 'pagination', { reports, totalCount, hasMore }, reports.length
+    );
 });
 
 /**

@@ -85,7 +85,10 @@ export default (err, req, res, next) => {
 
   if (process.env.NODE_ENV === "development") {
     sendErrorDev(res, err);
-  } else if (process.env.NODE_ENV === "production") {
+  } else {
+    // Anything that is not explicitly "development" is treated as production.
+    // Matching only "production" here used to leave the request hanging with no
+    // response whenever NODE_ENV was unset or set to something else (e.g. "test").
     // eslint-disable-next-line node/no-unsupported-features/es-syntax
 
     // let error = { ...err }; && structured clone cant be used because in spread operator the message is

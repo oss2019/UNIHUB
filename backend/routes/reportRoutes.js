@@ -35,6 +35,7 @@ import {
 import {
     validateReportCreation,
     validateReportTriage,
+    validateReportQuery,
     validateReportId
 } from '../validators/reportValidator.js';
 
@@ -54,7 +55,7 @@ router.post('/', validateReportCreation, createReport);
  * GET /api/reports/my — List your own reports.
  * Declared before '/:id' so the literal path is not swallowed by the param route.
  */
-router.get('/my', getMyReports);
+router.get('/my', validateReportQuery, getMyReports);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Admin Routes
@@ -64,7 +65,7 @@ router.get('/my', getMyReports);
 router.get('/stats', requireAdmin, getReportStats);
 
 /** GET /api/reports — Full triage board with filters and pagination */
-router.get('/', requireAdmin, getAllReports);
+router.get('/', requireAdmin, validateReportQuery, getAllReports);
 
 /** PATCH /api/reports/:id — Move a report through triage / attach an admin note */
 router.patch('/:id', requireAdmin, validateReportId, validateReportTriage, triageReport);

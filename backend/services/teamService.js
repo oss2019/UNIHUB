@@ -98,10 +98,13 @@ export const fetchTeamMemberById = async (id) => {
 export const insertTeamMember = async (memberData) => {
     const { photo, ...rest } = memberData;
 
-    return await TeamMember.create({
+    const created = await TeamMember.create({
         ...rest,
         photo: await resolvePhoto(photo)
     });
+
+    // Populate on the way out so a created member matches the shape of a fetched one
+    return await created.populate({ path: 'addedBy', select: ADDED_BY_FIELDS });
 };
 
 /**

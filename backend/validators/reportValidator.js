@@ -10,7 +10,7 @@
  * @requires validators/validatorUtils
  */
 
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 import { REPORT_CATEGORIES, REPORT_STATUSES } from '../models/reportModel.js';
 import {
     collectErrors,
@@ -63,6 +63,42 @@ export const validateReportTriage = [
 
     // Empty string is allowed here — it is how an admin clears a note
     optionalString('adminNote', 'Admin note', 1000, { allowEmpty: true }),
+
+    collectErrors
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Query Filter Validation — guards both listing endpoints
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Mirrors validateTeamQuery: an unrecognised filter is a 400 rather than a
+// silently empty page, so a typo in the admin board reads as a mistake instead
+// of "no reports". No sanitisers here — req.query is read-only under Express 5.
+
+export const validateReportQuery = [
+    query('status')
+        .optional()
+        .isIn(REPORT_STATUSES)
+        .withMessage(`Status must be one of: ${REPORT_STATUSES.join(', ')}`),
+
+    query('category')
+        .optional()
+        .isIn(REPORT_CATEGORIES)
+        .withMessage(`Category must be one of: ${REPORT_CATEGORIES.join(', ')}`),
+
+    query('search')
+        .optional()
+        .isString().withMessage('Search must be a string')
+        .bail()
+        .isLength({ max: 150 }).withMessage('Search cannot exceed 150 characters'),
+
+    query('page')
+        .optional()
+        .isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+
+    query('limit')
+        .optional()
+        .isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
 
     collectErrors
 ];

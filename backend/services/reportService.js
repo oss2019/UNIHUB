@@ -36,7 +36,7 @@ const HANDLER_FIELDS = 'name avatar role';
  * @param {number} [queryObj.page=1]     - 1-based page number.
  * @param {number} [queryObj.limit=20]   - Page size (max 100).
  * @param {string} [scopeToUserId]       - When set, restrict results to this reporter.
- * @returns {Promise<{reports: Array, total: number, page: number, limit: number}>}
+ * @returns {Promise<{reports: Array, totalCount: number, hasMore: boolean}>}
  */
 export const fetchAllReports = async (queryObj = {}, scopeToUserId = null) => {
     const mongoQuery = {};
@@ -60,18 +60,20 @@ export const fetchAllReports = async (queryObj = {}, scopeToUserId = null) => {
 
     const page = Math.max(1, Number(queryObj.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(queryObj.limit) || 20));
+    const skip = (page - 1) * limit;
 
-    const [reports, total] = await Promise.all([
+    const [reports, totalCount] = await Promise.all([
         Report.find(mongoQuery)
             .populate({ path: 'reportedBy', select: REPORTER_FIELDS })
             .populate({ path: 'handledBy', select: HANDLER_FIELDS })
             .sort({ createdAt: -1 }) // Newest first
-            .skip((page - 1) * limit)
+            .skip(skip)
             .limit(limit),
         Report.countDocuments(mongoQuery)
     ]);
 
-    return { reports, total, page, limit };
+    // Same {items, totalCount, hasMore} contract the thread endpoints return
+    return { reports, totalCount, hasMore: skip + reports.length < totalCount };
 };
 
 /**
