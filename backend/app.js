@@ -12,6 +12,9 @@ import commentRoutes from "./routes/commentRoutes.js"; // 🔥 IMPORTANT
 import notificationRoutes from "./routes/notificationRoutes.js";
 import workRequestRoutes from "./routes/workRequestRoutes.js";
 import resourceRoutes from "./routes/resourceRoutes.js";
+import facultyReviewRoutes from "./routes/facultyReviewRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
+import teamRoutes from "./routes/teamRoutes.js";
 import './config/scheduler.js'; // Start cron jobs on app boot
 
 import globalErrorHandler from "./controllers/errorController.js";
@@ -61,6 +64,9 @@ app.use("/api", subForumRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/resources", resourceRoutes);
+app.use("/api/faculty-reviews", facultyReviewRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/team", teamRoutes);
 app.use("/api", workRequestRoutes);
 
 // 404 handler
