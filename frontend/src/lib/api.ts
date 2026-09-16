@@ -15,6 +15,21 @@ import type {
   ForumType,
   Resource,
   CreateResourceInput,
+  FacultyReview,
+  CreateFacultyReviewInput,
+  UpdateFacultyReviewInput,
+  TeamMember,
+  TeamCategory,
+  TeamGrouped,
+  CreateTeamMemberInput,
+  UpdateTeamMemberInput,
+  Report,
+  ReportCategory,
+  ReportStatus,
+  ReportStats,
+  ReportPagination,
+  CreateReportInput,
+  TriageReportInput,
 } from "./types";
 
 export const API_BASE =
@@ -442,6 +457,96 @@ export const resourceApi = {
     ),
 };
 
+// ───────── Faculty Reviews ─────────
+export const facultyReviewApi = {
+  list: () =>
+    data<{ facultyReviews: FacultyReview[] }>(
+      request("/api/faculty-reviews"),
+    ).then((d) => d.facultyReviews),
+  get: (id: string) =>
+    data<{ facultyReview: FacultyReview }>(
+      request(`/api/faculty-reviews/${id}`),
+    ).then((d) => d.facultyReview),
+  create: (body: CreateFacultyReviewInput) =>
+    data<{ facultyReview: FacultyReview }>(
+      request("/api/faculty-reviews", { method: "POST", body }),
+    ).then((d) => d.facultyReview),
+  update: (id: string, body: UpdateFacultyReviewInput) =>
+    data<{ facultyReview: FacultyReview }>(
+      request(`/api/faculty-reviews/${id}`, { method: "PATCH", body }),
+    ).then((d) => d.facultyReview),
+  remove: (id: string) =>
+    request<void>(`/api/faculty-reviews/${id}`, { method: "DELETE" }),
+};
+
+// ───────── Team ─────────
+export const teamApi = {
+  listGrouped: () =>
+    data<{ team: TeamGrouped }>(
+      request("/api/team", { query: { grouped: "true" } }),
+    ).then((d) => d.team),
+  list: (category?: TeamCategory) =>
+    data<{ teamMembers: TeamMember[] }>(
+      request("/api/team", { query: { category } }),
+    ).then((d) => d.teamMembers),
+  get: (id: string) =>
+    data<{ teamMember: TeamMember }>(request(`/api/team/${id}`)).then(
+      (d) => d.teamMember,
+    ),
+  create: (body: CreateTeamMemberInput) =>
+    data<{ teamMember: TeamMember }>(
+      request("/api/team", { method: "POST", body }),
+    ).then((d) => d.teamMember),
+  update: (id: string, body: UpdateTeamMemberInput) =>
+    data<{ teamMember: TeamMember }>(
+      request(`/api/team/${id}`, { method: "PATCH", body }),
+    ).then((d) => d.teamMember),
+  remove: (id: string) =>
+    request<void>(`/api/team/${id}`, { method: "DELETE" }),
+};
+
+// ───────── Reports ─────────
+export const reportApi = {
+  create: (body: CreateReportInput) =>
+    data<{ report: Report }>(
+      request("/api/reports", { method: "POST", body }),
+    ).then((d) => d.report),
+  myReports: (page = 1, limit = 20) =>
+    data<{ pagination: ReportPagination }>(
+      request("/api/reports/my", { query: { page, limit } }),
+    ).then((d) => d.pagination),
+  list: (filters?: {
+    status?: ReportStatus;
+    category?: ReportCategory;
+    page?: number;
+    limit?: number;
+  }) =>
+    data<{ pagination: ReportPagination }>(
+      request("/api/reports", {
+        query: filters as Record<string, string | number | undefined>,
+      }),
+    ).then((d) => d.pagination),
+  get: (id: string) =>
+    data<{ report: Report }>(request(`/api/reports/${id}`)).then(
+      (d) => d.report,
+    ),
+  stats: () =>
+    data<{ stats: ReportStats }>(request("/api/reports/stats")).then(
+      (d) => d.stats,
+    ),
+  triage: (id: string, body: TriageReportInput) =>
+    data<{ report: Report }>(
+      request(`/api/reports/${id}`, { method: "PATCH", body }),
+    ).then((d) => d.report),
+  remove: (id: string) =>
+    request<void>(`/api/reports/${id}`, { method: "DELETE" }),
+};
+
+// Integration brief naming aliases
+export const facultyReviews = facultyReviewApi;
+export const team = teamApi;
+export const reports = reportApi;
+
 // File → base64 data URL helper for thread attachments
 export const fileToDataURL = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -450,3 +555,4 @@ export const fileToDataURL = (file: File): Promise<string> =>
     r.onerror = reject;
     r.readAsDataURL(file);
   });
+

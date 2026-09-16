@@ -9,8 +9,12 @@ import {
   notificationApi,
   workRequestApi,
   resourceApi,
+  facultyReviewApi,
+  teamApi,
+  reportApi,
   ApiError,
 } from "./api";
+import type { TeamCategory, ReportStatus, ReportCategory } from "./types";
 
 export const qk = {
   me: ["me"] as const,
@@ -29,6 +33,20 @@ export const qk = {
   searchThreads: (q: string) => ["search", q] as const,
   resources: (filters: Record<string, string | number | undefined>) =>
     ["resources", filters] as const,
+  facultyReviews: ["facultyReviews"] as const,
+  facultyReview: (id: string) => ["facultyReview", id] as const,
+  teamGrouped: ["team", "grouped"] as const,
+  team: (category?: string) => ["team", category ?? "all"] as const,
+  myReports: (page?: number, limit?: number) =>
+    ["reports", "my", { page, limit }] as const,
+  allReports: (filters?: {
+    status?: ReportStatus;
+    category?: ReportCategory;
+    page?: number;
+    limit?: number;
+  }) => ["reports", "all", filters] as const,
+  reportStats: ["reports", "stats"] as const,
+  report: (id: string) => ["report", id] as const,
 };
 
 export const meQuery = () =>
@@ -131,3 +149,57 @@ export const resourcesQuery = (
     queryFn: () => resourceApi.list(filters),
     staleTime: 30_000,
   });
+
+export const facultyReviewsQuery = () =>
+  queryOptions({
+    queryKey: qk.facultyReviews,
+    queryFn: () => facultyReviewApi.list(),
+    staleTime: 60_000,
+  });
+
+export const teamGroupedQuery = () =>
+  queryOptions({
+    queryKey: qk.teamGrouped,
+    queryFn: () => teamApi.listGrouped(),
+    staleTime: 60_000,
+  });
+
+export const teamListQuery = (category?: TeamCategory) =>
+  queryOptions({
+    queryKey: qk.team(category),
+    queryFn: () => teamApi.list(category),
+    staleTime: 60_000,
+  });
+
+export const myReportsQuery = (page = 1, limit = 20, enabled = true) =>
+  queryOptions({
+    queryKey: qk.myReports(page, limit),
+    queryFn: () => reportApi.myReports(page, limit),
+    enabled,
+    staleTime: 15_000,
+  });
+
+export const allReportsQuery = (
+  filters: {
+    status?: ReportStatus;
+    category?: ReportCategory;
+    page?: number;
+    limit?: number;
+  } = {},
+  enabled = true,
+) =>
+  queryOptions({
+    queryKey: qk.allReports(filters),
+    queryFn: () => reportApi.list(filters),
+    enabled,
+    staleTime: 15_000,
+  });
+
+export const reportStatsQuery = (enabled = true) =>
+  queryOptions({
+    queryKey: qk.reportStats,
+    queryFn: () => reportApi.stats(),
+    enabled,
+    staleTime: 15_000,
+  });
+

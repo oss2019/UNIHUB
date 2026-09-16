@@ -9,6 +9,7 @@ import { ThemeController } from "@/components/ThemeController";
 import { AuthModal } from "@/components/modals/AuthModal";
 import { CreatePostModal } from "@/components/modals/CreatePostModal";
 import { NotificationsModal } from "@/components/modals/NotificationsModal";
+import { ReportIssueModal } from "@/components/modals/ReportIssueModal";
 import { meQuery } from "@/lib/queries";
 import { TutorialTour } from "@/components/TutorialTour";
 import { useTourStore } from "@/lib/tourStore";
@@ -89,6 +90,7 @@ export function Layout() {
       <AuthModal />
       <CreatePostModal />
       <NotificationsModal />
+      <ReportIssueModal />
       <TutorialTour />
       <Toaster richColors position="top-right" theme="dark" />
     </div>

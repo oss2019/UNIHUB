@@ -8,6 +8,9 @@ import { SubforumPage } from "./pages/SubforumPage";
 import { ThreadPage } from "./pages/ThreadPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { OnboardingPage } from "./pages/OnboardingPage";
+import { FacultyReviewsPage } from "./pages/FacultyReviewsPage";
+import { TeamPage } from "./pages/TeamPage";
+import { ReportsPage } from "./pages/ReportsPage";
 
 export default function App() {
   return (
@@ -17,6 +20,9 @@ export default function App() {
         <Route path="onboarding" element={<OnboardingPage />} />
         <Route path="calendar" element={<CalendarPage />} />
         <Route path="resources" element={<ResourcesPage />} />
+        <Route path="faculty-reviews" element={<FacultyReviewsPage />} />
+        <Route path="team" element={<TeamPage />} />
+        <Route path="reports" element={<ReportsPage />} />
         <Route path="f/:slug" element={<ForumPage />} />
         <Route path="f/:slug/:subId" element={<SubforumPage />} />
         <Route path="f/:slug/:subId/:threadId" element={<ThreadPage />} />

@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Home, Library, Calendar, Users, HelpCircle } from "lucide-react";
+import { Home, Library, Calendar, Users, HelpCircle, GraduationCap, ShieldCheck, Bug } from "lucide-react";
 import { forumsQuery } from "@/lib/queries";
 import { useTourStore } from "@/lib/tourStore";
 
@@ -8,6 +8,9 @@ const navItems = [
   { to: "/", label: "Home", icon: Home },
   { to: "/resources", label: "Resources", icon: Library },
   { to: "/calendar", label: "Calendar", icon: Calendar },
+  { to: "/faculty-reviews", label: "Faculty Reviews", icon: GraduationCap },
+  { to: "/team", label: "Our Team", icon: ShieldCheck },
+  { to: "/reports", label: "Issue Reports", icon: Bug },
 ];
 
 export function LeftSidebar() {

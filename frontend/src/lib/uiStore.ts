@@ -8,10 +8,12 @@ type UI = {
   notifOpen: boolean;
   // when set, CreatePost modal opens with this subforum preselected
   createDefaultSubforumId: string | null;
+  reportModalOpen: boolean;
   toggleDark: () => void;
   setAuthOpen: (v: boolean) => void;
   setCreateOpen: (v: boolean, defaultSubforumId?: string | null) => void;
   setNotifOpen: (v: boolean) => void;
+  setReportModalOpen: (v: boolean) => void;
 };
 
 export const useUI = create<UI>((set) => ({
@@ -20,6 +22,7 @@ export const useUI = create<UI>((set) => ({
   createOpen: false,
   notifOpen: false,
   createDefaultSubforumId: null,
+  reportModalOpen: false,
   toggleDark: () => set((s) => ({ isDark: !s.isDark })),
   setAuthOpen: (v) => set({ authOpen: v }),
   setCreateOpen: (v, defaultSubforumId = null) =>
@@ -28,4 +31,5 @@ export const useUI = create<UI>((set) => ({
       createDefaultSubforumId: v ? defaultSubforumId : null,
     }),
   setNotifOpen: (v) => set({ notifOpen: v }),
+  setReportModalOpen: (v) => set({ reportModalOpen: v }),
 }));

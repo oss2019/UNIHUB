@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Home, Library, Calendar } from "lucide-react";
+import { X, Home, Library, Calendar, GraduationCap, ShieldCheck, Bug } from "lucide-react";
 import { forumsQuery } from "@/lib/queries";
 
 const items = [
   { to: "/", label: "Home", icon: Home },
   { to: "/resources", label: "Resources", icon: Library },
   { to: "/calendar", label: "Calendar", icon: Calendar },
+  { to: "/faculty-reviews", label: "Faculty Reviews", icon: GraduationCap },
+  { to: "/team", label: "Our Team", icon: ShieldCheck },
+  { to: "/reports", label: "Issue Reports", icon: Bug },
 ];
 
 export function MobileDrawer({

@@ -200,3 +200,112 @@ export type CreateResourceInput = {
   fileType: ResourceFileType;
   fileSize?: string;
 };
+
+// ===================== FACULTY REVIEWS =====================
+export type FacultyReview = {
+  _id: string;
+  facultyName: string;
+  review: string;
+  photo?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type CreateFacultyReviewInput = {
+  facultyName: string;
+  review: string;
+  photo?: string;
+};
+
+export type UpdateFacultyReviewInput = Partial<CreateFacultyReviewInput>;
+
+// ===================== TEAM MEMBERS =====================
+export type TeamCategory =
+  | "dev-team"
+  | "academic-council"
+  | "current-academic-council";
+
+export type TeamMember = {
+  _id: string;
+  name: string;
+  graduationYear: number;
+  category: TeamCategory;
+  photo?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type TeamGrouped = {
+  "dev-team": TeamMember[];
+  "academic-council": TeamMember[];
+  "current-academic-council": TeamMember[];
+};
+
+export type CreateTeamMemberInput = {
+  name: string;
+  graduationYear: number;
+  category: TeamCategory;
+  photo?: string;
+};
+
+export type UpdateTeamMemberInput = Partial<CreateTeamMemberInput>;
+
+// ===================== REPORTS =====================
+export type ReportCategory =
+  | "bug"
+  | "ui"
+  | "performance"
+  | "content"
+  | "account"
+  | "other";
+
+export type ReportStatus = "open" | "in-progress" | "resolved" | "dismissed";
+
+export type ReportUser = {
+  _id?: string;
+  name: string;
+  email?: string;
+  avatar?: string;
+  role?: string;
+};
+
+export type Report = {
+  _id: string;
+  title: string;
+  description: string;
+  category: ReportCategory;
+  status: ReportStatus;
+  screenshot?: string;
+  adminNote?: string;
+  reportedBy: ReportUser | string;
+  resolvedBy?: { _id?: string; name: string } | string;
+  resolvedAt?: string;
+  createdAt: string;
+  updatedAt?: string;
+};
+
+export type ReportStats = {
+  open: number;
+  "in-progress": number;
+  resolved: number;
+  dismissed: number;
+};
+
+export type ReportPagination = {
+  reports: Report[];
+  totalCount: number;
+  hasMore: boolean;
+};
+
+export type CreateReportInput = {
+  title: string;
+  description: string;
+  category: ReportCategory;
+  screenshot?: string;
+};
+
+export type TriageReportInput = {
+  status?: ReportStatus;
+  adminNote?: string;
+};
+
