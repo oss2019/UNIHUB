@@ -1554,17 +1554,17 @@ export default function App() {
                                 [req._id]: e.target.value,
                               }))
                             }
-                            className="form-input flex-1 text-sm"
+                            className="form-input w-full text-sm"
                           />
-                          <div className="flex gap-2">
+                          <div className="req-action-btns">
                             <button
-                              className="btn btn-success btn-sm"
+                              className="btn btn-primary btn-sm flex-1"
                               onClick={() => reviewForumRequest(req._id, "approved")}
                             >
                               <Check className="w-4 h-4" /> Approve
                             </button>
                             <button
-                              className="btn btn-danger-outline btn-sm"
+                              className="btn btn-secondary btn-sm flex-1"
                               onClick={() => reviewForumRequest(req._id, "rejected")}
                             >
                               <X className="w-4 h-4" /> Reject
@@ -1640,17 +1640,17 @@ export default function App() {
                                 [req._id]: e.target.value,
                               }))
                             }
-                            className="form-input flex-1 text-sm"
+                            className="form-input w-full text-sm"
                           />
-                          <div className="flex gap-2">
+                          <div className="req-action-btns">
                             <button
-                              className="btn btn-success btn-sm"
+                              className="btn btn-primary btn-sm flex-1"
                               onClick={() => reviewSubForumRequest(req._id, "approved")}
                             >
                               <Check className="w-4 h-4" /> Approve
                             </button>
                             <button
-                              className="btn btn-danger-outline btn-sm"
+                              className="btn btn-secondary btn-sm flex-1"
                               onClick={() => reviewSubForumRequest(req._id, "rejected")}
                             >
                               <X className="w-4 h-4" /> Reject

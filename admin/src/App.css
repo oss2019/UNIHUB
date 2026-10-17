@@ -798,6 +798,17 @@ input:checked + .toggle-slider:before {
   color: #ffffff;
 }
 
+.btn-success {
+  background-color: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.btn-success:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
 .btn-danger,
 .btn-danger-outline {
   background-color: transparent;
@@ -1327,7 +1338,7 @@ input:checked + .toggle-slider:before {
    ========================================================================== */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
 }
 
@@ -1335,15 +1346,36 @@ input:checked + .toggle-slider:before {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .req-action-bar {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  width: 100%;
+  min-width: 0;
+}
+
+.req-action-bar .form-input {
+  width: 100%;
+  min-width: 0;
+}
+
+.req-action-btns {
+  display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-subtle);
+  width: 100%;
+}
+
+.req-action-btns .btn {
+  flex: 1;
+  min-width: 0;
 }
 
 .course-review-card {
