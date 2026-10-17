@@ -129,7 +129,7 @@ export function ReportIssueModal() {
             <div className="space-y-1">
               <h4 className="font-semibold text-foreground">Sign In Required</h4>
               <p className="text-sm text-muted-foreground">
-                You must be logged in to your UNIHUB account to submit issue reports so we can track and follow up on your problem.
+                You must be logged in to your PeerHive.IITDh account to submit issue reports so we can track and follow up on your problem.
               </p>
             </div>
             <Button

@@ -36,8 +36,8 @@ export function ThreadPage() {
 
   useEffect(() => {
     document.title = thread?.title
-      ? `${thread.title} — PeerHive`
-      : "Thread — PeerHive";
+      ? `${thread.title} — PeerHive.IITDh`
+      : "Thread — PeerHive.IITDh";
   }, [thread?.title]);
 
   const commentMut = useMutation({

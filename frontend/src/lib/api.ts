@@ -505,27 +505,59 @@ export const teamApi = {
     request<void>(`/api/team/${id}`, { method: "DELETE" }),
 };
 
+const unwrapReports = (d: unknown): ReportPagination => {
+  if (!d || typeof d !== "object") {
+    return { reports: [], totalCount: 0, hasMore: false };
+  }
+  const obj = d as Record<string, unknown>;
+  const rawPayload = obj.reports ?? obj.pagination ?? obj;
+  let reportsList: Report[] = [];
+  let total = 0;
+
+  if (Array.isArray(rawPayload)) {
+    reportsList = rawPayload as Report[];
+    total = reportsList.length;
+  } else if (rawPayload && typeof rawPayload === "object") {
+    const p = rawPayload as Record<string, unknown>;
+    if (Array.isArray(p.reports)) {
+      reportsList = p.reports as Report[];
+    }
+    total =
+      typeof p.total === "number"
+        ? p.total
+        : typeof p.totalCount === "number"
+          ? p.totalCount
+          : reportsList.length;
+  }
+
+  return {
+    reports: reportsList,
+    totalCount: total,
+    hasMore: false,
+  };
+};
+
 // ───────── Reports ─────────
 export const reportApi = {
   create: (body: CreateReportInput) =>
     data<{ report: Report }>(
       request("/api/reports", { method: "POST", body }),
     ).then((d) => d.report),
-  myReports: (page = 1, limit = 20) =>
-    data<{ pagination: ReportPagination }>(
+  myReports: (page = 1, limit = 50) =>
+    data<unknown>(
       request("/api/reports/my", { query: { page, limit } }),
-    ).then((d) => d.pagination),
+    ).then(unwrapReports),
   list: (filters?: {
     status?: ReportStatus;
     category?: ReportCategory;
     page?: number;
     limit?: number;
   }) =>
-    data<{ pagination: ReportPagination }>(
+    data<unknown>(
       request("/api/reports", {
         query: filters as Record<string, string | number | undefined>,
       }),
-    ).then((d) => d.pagination),
+    ).then(unwrapReports),
   get: (id: string) =>
     data<{ report: Report }>(request(`/api/reports/${id}`)).then(
       (d) => d.report,

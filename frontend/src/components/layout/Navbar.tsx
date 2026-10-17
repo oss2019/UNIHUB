@@ -39,14 +39,14 @@ export function Navbar() {
             <Menu className="h-5 w-5" />
           </button>
 
-          <Link to="/" className="flex items-center gap-2 font-display">
+          <Link to="/" className="flex items-center gap-2.5 font-display group">
             <img
               src="/peerhive/Peerhive_Logo-removebg-preview.png"
-              alt="PeerHive Logo"
-              className="h-9 w-9 object-contain"
+              alt="PeerHive.IITDh Logo"
+              className="h-11 w-11 md:h-12 md:w-12 object-contain transition-transform group-hover:scale-105"
             />
-            <span className="hidden sm:block text-lg font-bold tracking-tight">
-              peer<span className="text-primary">hive</span>
+            <span className="hidden sm:block text-xl font-bold tracking-tight">
+              PeerHive<span className="text-primary">.IITDh</span>
             </span>
           </Link>
 

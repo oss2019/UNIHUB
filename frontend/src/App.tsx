@@ -20,6 +20,7 @@ export default function App() {
         <Route path="onboarding" element={<OnboardingPage />} />
         <Route path="calendar" element={<CalendarPage />} />
         <Route path="resources" element={<ResourcesPage />} />
+        <Route path="course-reviews" element={<FacultyReviewsPage />} />
         <Route path="faculty-reviews" element={<FacultyReviewsPage />} />
         <Route path="team" element={<TeamPage />} />
         <Route path="reports" element={<ReportsPage />} />

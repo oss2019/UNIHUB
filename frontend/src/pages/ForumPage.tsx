@@ -24,8 +24,8 @@ export function ForumPage() {
 
   useEffect(() => {
     document.title = data?.forum?.name
-      ? `${data.forum.name} — PeerHive`
-      : "Forum — PeerHive";
+      ? `${data.forum.name} — PeerHive.IITDh`
+      : "Forum — PeerHive.IITDh";
   }, [data?.forum?.name]);
 
   const createSubforumMut = useMutation({

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -99,10 +99,19 @@ export function ReportsPage() {
   const { setReportModalOpen, setAuthOpen } = useUI();
   const isAdmin = user?.role === "admin";
 
+  useEffect(() => {
+    document.title = "Reports — PeerHive.IITDh";
+  }, []);
+
   // Tab: for admins, allow switching between "all" (Triage) and "mine"
-  const [activeTab, setActiveTab] = useState<"triage" | "mine">(
-    isAdmin ? "triage" : "mine"
-  );
+  const [activeTab, setActiveTab] = useState<"triage" | "mine">("mine");
+  const [userToggledTab, setUserToggledTab] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin && !userToggledTab) {
+      setActiveTab("triage");
+    }
+  }, [isAdmin, userToggledTab]);
 
   // Admin filter states
   const [statusFilter, setStatusFilter] = useState<ReportStatus | "all">("all");
@@ -231,7 +240,7 @@ export function ReportsPage() {
             </h1>
             <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
               {isAdmin && activeTab === "triage"
-                ? "Review, prioritize, assign, and resolve user-submitted bugs, glitches, and feedback tickets across UNIHUB."
+                ? "Review, prioritize, assign, and resolve user-submitted bugs, glitches, and feedback tickets across PeerHive.IITDh."
                 : "Track the real-time status of bugs, layout glitches, and suggestions you've filed with the development team."}
             </p>
           </div>
@@ -253,7 +262,10 @@ export function ReportsPage() {
         {isAdmin && (
           <div className="mt-6 flex gap-2 border-t border-border/50 pt-4">
             <button
-              onClick={() => setActiveTab("triage")}
+              onClick={() => {
+                setActiveTab("triage");
+                setUserToggledTab(true);
+              }}
               className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 ${
                 activeTab === "triage"
                   ? "bg-primary text-primary-foreground shadow-sm"
@@ -263,7 +275,10 @@ export function ReportsPage() {
               <Layers className="w-4 h-4" /> Admin Triage ({stats.open + stats["in-progress"] + stats.resolved + stats.dismissed})
             </button>
             <button
-              onClick={() => setActiveTab("mine")}
+              onClick={() => {
+                setActiveTab("mine");
+                setUserToggledTab(true);
+              }}
               className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 ${
                 activeTab === "mine"
                   ? "bg-primary text-primary-foreground shadow-sm"

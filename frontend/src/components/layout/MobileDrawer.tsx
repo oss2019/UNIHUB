@@ -8,9 +8,9 @@ const items = [
   { to: "/", label: "Home", icon: Home },
   { to: "/resources", label: "Resources", icon: Library },
   { to: "/calendar", label: "Calendar", icon: Calendar },
-  { to: "/faculty-reviews", label: "Faculty Reviews", icon: GraduationCap },
+  { to: "/course-reviews", label: "Course Review", icon: GraduationCap },
   { to: "/team", label: "Our Team", icon: ShieldCheck },
-  { to: "/reports", label: "Issue Reports", icon: Bug },
+  { to: "/reports", label: "Report an Issue", icon: Bug },
 ];
 
 export function MobileDrawer({

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 export function NotFoundPage() {
   useEffect(() => {
-    document.title = "404 — PeerHive";
+    document.title = "404 — PeerHive.IITDh";
   }, []);
 
   return (
@@ -19,7 +19,7 @@ export function NotFoundPage() {
             to="/"
             className="inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground px-5 py-2.5 text-sm font-medium hover:opacity-90"
           >
-            Back to PeerHive
+            Back to PeerHive.IITDh
           </Link>
         </div>
       </div>

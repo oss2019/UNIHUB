@@ -3,7 +3,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 
 export function CalendarPage() {
   useEffect(() => {
-    document.title = "Calendar — PeerHive";
+    document.title = "Calendar — PeerHive.IITDh";
   }, []);
 
   return (

@@ -109,7 +109,7 @@ export function OnboardingPage() {
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="relative">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-semibold mb-6">
-            <Sparkles className="h-3.5 w-3.5" /> Welcome to PeerHive
+            <Sparkles className="h-3.5 w-3.5" /> Welcome to PeerHive.IITDh
           </div>
 
           <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-3">

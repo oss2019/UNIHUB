@@ -41,8 +41,8 @@ export function SubforumPage() {
 
   useEffect(() => {
     document.title = sub?.name
-      ? `${sub.name} — PeerHive`
-      : "Subforum — PeerHive";
+      ? `${sub.name} — PeerHive.IITDh`
+      : "Subforum — PeerHive.IITDh";
   }, [sub?.name]);
 
   const parentForum = sub && typeof sub.forum === "object" ? sub.forum : null;

@@ -164,7 +164,7 @@ const getFileTypeStyle = (type: ResourceFileType) => {
 
 export function ResourcesPage() {
   useEffect(() => {
-    document.title = "Resources — PeerHive";
+    document.title = "Resources — PeerHive.IITDh";
   }, []);
 
   const queryClient = useQueryClient();
@@ -441,7 +441,7 @@ export function ResourcesPage() {
                 <Sparkles className="h-3.5 w-3.5" /> Curated Repository
               </span>
               <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
-                PeerHive <span className="text-primary">Resources</span>
+                PeerHive<span className="text-primary">.IITDh Resources</span>
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
                 Browse academic lecture slides, lab manuals, projects, and

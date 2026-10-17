@@ -7,7 +7,7 @@ import { forumsQuery, meQuery } from "@/lib/queries";
 
 export function HomePage() {
   useEffect(() => {
-    document.title = "PeerHive — Home";
+    document.title = "PeerHive.IITDh — Home";
   }, []);
 
   const { data: forums = [], isLoading } = useQuery(forumsQuery());

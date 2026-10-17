@@ -112,13 +112,13 @@ export function TeamPage() {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>The People Behind UNIHUB</span>
+              <span>The People Behind PeerHive.IITDh</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-display text-foreground">
               Our Community & Council
             </h1>
             <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
-              Meet the student developers, council delegates, and alumni leaders who build, curate, and maintain UNIHUB for the entire institution.
+              Meet the student developers, council delegates, and alumni leaders who build, curate, and maintain PeerHive.IITDh for the entire institution.
             </p>
           </div>
 

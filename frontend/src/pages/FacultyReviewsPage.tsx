@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -26,6 +26,10 @@ export function FacultyReviewsPage() {
   const { data: user } = useQuery(meQuery());
   const isAdmin = user?.role === "admin";
 
+  useEffect(() => {
+    document.title = "Course Review — PeerHive.IITDh";
+  }, []);
+
   const { data: reviews = [], isLoading } = useQuery(facultyReviewsQuery());
 
   const [search, setSearch] = useState("");
@@ -40,7 +44,7 @@ export function FacultyReviewsPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => facultyReviewApi.remove(id),
     onSuccess: () => {
-      toast.success("Faculty review deleted.");
+      toast.success("Course review deleted.");
       qc.invalidateQueries({ queryKey: qk.facultyReviews });
     },
     onError: (e: Error) => {
@@ -82,13 +86,13 @@ export function FacultyReviewsPage() {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Campus Directory</span>
+              <span>Course & Academic Directory</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-display text-foreground">
-              Faculty Reviews
+              Course Review
             </h1>
             <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
-              Verified campus assessments and student guidance covering teaching styles, grading, coursework rigor, and research mentorship.
+              Verified campus assessments and student guidance covering course rigor, grading patterns, syllabus coverage, and academic mentorship.
             </p>
           </div>
 
@@ -107,7 +111,7 @@ export function FacultyReviewsPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by professor name or keyword..."
+            placeholder="Search by course code, professor name, or keyword..."
             className="pl-10 h-11 bg-background/80 border-border/80 rounded-xl focus:border-primary/50"
           />
         </div>
@@ -129,12 +133,12 @@ export function FacultyReviewsPage() {
             <GraduationCap className="w-6 h-6" />
           </div>
           <h3 className="font-semibold text-foreground text-base">
-            {search ? "No reviews match your search" : "No faculty reviews published yet"}
+            {search ? "No reviews match your search" : "No course reviews published yet"}
           </h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
             {search
               ? "Try tweaking your search term or clear the filter."
-              : "Faculty reviews will appear here once published by academic administrators."}
+              : "Course reviews will appear here once published by academic administrators."}
           </p>
           {isAdmin && !search && (
             <Button onClick={handleCreate} variant="outline" className="mt-4 gap-2">
@@ -230,7 +234,7 @@ export function FacultyReviewsPage() {
                   {/* Footer */}
                   {rev.createdAt && (
                     <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
-                      <span>Verified Academic Review</span>
+                      <span>Verified Course Review</span>
                       <span>
                         {new Date(rev.createdAt).toLocaleDateString(undefined, {
                           year: "numeric",

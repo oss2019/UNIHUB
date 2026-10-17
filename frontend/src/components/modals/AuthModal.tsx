@@ -32,7 +32,7 @@ export function AuthModal() {
     <Modal
       open={authOpen}
       onClose={() => setAuthOpen(false)}
-      title={user ? "Your profile" : "Welcome to PeerHive"}
+      title={user ? "Your profile" : "Welcome to PeerHive.IITDh"}
       maxWidth="max-w-md"
     >
       {user ? (
@@ -100,7 +100,7 @@ export function AuthModal() {
             <ExternalLink className="h-4 w-4" /> Continue with Google
           </Button>
           <p className="text-[11px] text-muted-foreground">
-            You'll be redirected to Google, then back to PeerHive.
+            You'll be redirected to Google, then back to PeerHive.IITDh.
           </p>
           <p className="text-[11px] text-muted-foreground/70">
             API: {API_BASE}

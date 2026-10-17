@@ -156,9 +156,9 @@ export function TutorialTour() {
   const TOUR_STEPS = useMemo(
     (): TourStep[] => [
       {
-        title: "👋 Welcome to PeerHive!",
+        title: "👋 Welcome to PeerHive.IITDh!",
         content:
-          "PeerHive is the collaborative hub built specifically for the IIT Dharwad campus community. Let's take a quick tour to see how to discuss, find study files, and connect!",
+          "PeerHive.IITDh is the collaborative hub built specifically for the IIT Dharwad campus community. Let's take a quick tour to see how to discuss, find study files, and connect!",
         placement: "center",
         route: "/",
       },

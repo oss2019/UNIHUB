@@ -77,20 +77,20 @@ export function FacultyReviewDialog({
     },
     onSuccess: () => {
       toast.success(
-        reviewToEdit ? "Faculty review updated!" : "Faculty review published!"
+        reviewToEdit ? "Course review updated!" : "Course review published!"
       );
       qc.invalidateQueries({ queryKey: qk.facultyReviews });
       onClose();
     },
     onError: (e: Error) => {
-      toast.error(e.message || "Failed to save faculty review.");
+      toast.error(e.message || "Failed to save course review.");
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!facultyName.trim()) {
-      toast.error("Faculty name is required.");
+      toast.error("Course / Instructor name is required.");
       return;
     }
     if (!review.trim()) {
@@ -98,7 +98,7 @@ export function FacultyReviewDialog({
       return;
     }
     if (facultyName.length > 120) {
-      toast.error("Faculty name must be under 120 characters.");
+      toast.error("Course / Instructor name must be under 120 characters.");
       return;
     }
     if (review.length > 5000) {
@@ -112,18 +112,18 @@ export function FacultyReviewDialog({
     <Modal
       open={open}
       onClose={onClose}
-      title={reviewToEdit ? "Edit Faculty Review" : "Add Faculty Review"}
+      title={reviewToEdit ? "Edit Course Review" : "Add Course Review"}
       maxWidth="max-w-lg"
     >
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Faculty Member Name <span className="text-rose-500">*</span>
+            Course / Instructor Name <span className="text-rose-500">*</span>
           </label>
           <div className="relative">
             <GraduationCap className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="e.g. Prof. Arvind Sharma"
+              placeholder="e.g. CS201 - Data Structures / Prof. Sharma"
               value={facultyName}
               onChange={(e) => setFacultyName(e.target.value)}
               maxLength={120}

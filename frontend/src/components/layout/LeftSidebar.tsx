@@ -8,9 +8,9 @@ const navItems = [
   { to: "/", label: "Home", icon: Home },
   { to: "/resources", label: "Resources", icon: Library },
   { to: "/calendar", label: "Calendar", icon: Calendar },
-  { to: "/faculty-reviews", label: "Faculty Reviews", icon: GraduationCap },
+  { to: "/course-reviews", label: "Course Review", icon: GraduationCap },
   { to: "/team", label: "Our Team", icon: ShieldCheck },
-  { to: "/reports", label: "Issue Reports", icon: Bug },
+  { to: "/reports", label: "Report an Issue", icon: Bug },
 ];
 
 export function LeftSidebar() {
@@ -23,12 +23,14 @@ export function LeftSidebar() {
       <div className="sticky top-20 space-y-6">
         <nav data-tour="sidebar-nav" className="space-y-1">
           {navItems.map(({ to, label, icon: Icon }) => {
-            const active = loc.pathname === to;
+            const active =
+              loc.pathname === to ||
+              (to === "/course-reviews" && loc.pathname === "/faculty-reviews");
             return (
               <Link
                 key={to}
                 to={to}
-                data-tour={`sidebar-${label.toLowerCase()}`}
+                data-tour={`sidebar-${label.toLowerCase().replace(/\s+/g, "-")}`}
                 className={`flex items-center gap-3 px-3 h-10 rounded-xl text-sm font-medium transition ${
                   active
                     ? "bg-primary text-primary-foreground"
